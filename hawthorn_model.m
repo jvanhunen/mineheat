@@ -4,19 +4,19 @@ clear geom
 
 if option == 1
     if igeom == 1
-        geom = xlsread('mine_system.xlsx','high main');
+        geom = xlsread('data/mine_system.xlsx','high main');
     elseif igeom == 2
-        geom = xlsread('mine_system.xlsx','low main');
+        geom = xlsread('data/mine_system.xlsx','low main');
     elseif igeom == 3
-        geom = xlsread('mine_system.xlsx','harvey');
+        geom = xlsread('data/mine_system.xlsx','harvey');
     end
 elseif option == 2
     if igeom == 1
-        geom = xlsread('mine_system_alt.xlsx','high main');
+        geom = xlsread('data/mine_system_alt.xlsx','high main');
     elseif igeom == 2
-        geom = xlsread('mine_system_alt.xlsx','low main');
+        geom = xlsread('data/mine_system_alt.xlsx','low main');
     elseif igeom == 3
-        geom = xlsread('mine_system_alt.xlsx','harvey');
+        geom = xlsread('data/mine_system_alt.xlsx','harvey');
     end
 end
     

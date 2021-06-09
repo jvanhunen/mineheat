@@ -17,7 +17,7 @@ clear
 % Jeroen van Hunen
 
 % Set constant input parameters:
-igeom  = 5;        % pipe geometry option
+igeom  = 7;        % pipe geometry option
 Tf_ini = 3;        % water inflow temperature (degC) 
 nyrs   = 1;        % flow duration (yrs)
 head   = 1e-11;     % hydraulic head loss through mine (m). e.g. 6.3e-12 
@@ -81,13 +81,13 @@ L  = sqrt(dx(:,1).^2+dx(:,2).^2);
 
 % set fixed hydraulic heads:
 Ho     = zeros(no,1);
-Ho(1)  = head;
+Ho(1)  = head;  % ... and by definition, Ho(2)=0;
 
 % Initial rock temperature (in degC):   
 Tin    = Tf_ini*ones(np,1);
 
 % Calculate flow through pipe system:
-[H Q]  = mineflow_mod(nn, no, np, x, xo, A12, A10, Ho, L, d);
+[H Q]  = mineflow(nn, no, np, x, xo, A12, A10, Ho, L, d);
 
 %%% Setup pipe flow arrays:
 [pipe_nodes npipes node_pipes_out node_pipes_in weighted_flow_in Q] ...

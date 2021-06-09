@@ -1,7 +1,7 @@
 function [nn, no, np, A12, A10, xo, x, d] = louisa_model(d_in);
 
 clear geom
-geom = xlsread('LMM_2a-D');
+geom = xlsread('data/LMM_2a-D');
 
 
 % size of problem:
