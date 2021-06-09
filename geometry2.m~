@@ -36,7 +36,7 @@ x(4,:)  = [100 200];
 x(5,:)  = [200 200];
 x(6,:)  = [300 200];
 
-% General definition of matrix A12 (and A10): 
+% General definition of matrix A12: 
 %    A12(ip,in) = if    
 %    means: if if==1, then pipe ip feeds into node in
 %           if if==-2, then pipe ip flows out of node in

@@ -1,4 +1,4 @@
- function [H Q] = mineflow(nn, no, np, x, xo, A12, A10, Ho, L, d)
+ function [H Q] = mineflow(nn, no, np, x, xo, A12, A10, Ho, q, L, d)
 % 
 % This routine solves for the flow in the pipes. The method follows the
 % EPANET manual (Appendix D and p.30/Table 3.1), which follows (Todini&Paliti, 1987)
@@ -18,8 +18,6 @@ H    = zeros(nn,1);
 Q    = ones(np,1);
 % Fluid resistance coefficient (called R in 
 r    = zeros(np,1);
-% fixed fluxes: all set to zero, not sure if it works if non-zero!!
-q    = zeros(nn,1);
 % flow powerlaw exponent ( called B in EPANET manual, p.30, and n in
 %                          (Todini&Paliti, 1987))
 B    = 2;  % Not sure if eqns below are valid if B is not 2!

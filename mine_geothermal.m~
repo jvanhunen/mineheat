@@ -113,6 +113,8 @@ elseif igeom==102
     % set any external in/outflow for each (non-fixed) node:
     q    = zeros(nn,1);
     q(1) = -1.575e-4;  % prescribed external flow into first node 
+    q(4) = 1e-4;
+    q(
     q(nn) = 1.575e-4;  % prescribed external flow out of last node 
 end
 r      = d/2;
