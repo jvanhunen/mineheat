@@ -1,4 +1,4 @@
-function [nn, no, np, A12, A10, xo, x, p_output, d] = geometry_grid(n,m,l1,l2,id)
+function [nn, no, np, A12, A10, xo, x, d] = geometry_grid(n,m,l1,l2,id)
 
 % with: 
 %   - = pip
