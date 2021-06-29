@@ -2,6 +2,9 @@ function [Tn Tp] = mine_heat(t, r, L, Q, v, np, nn, no, Tf_ini,...
     k_r, Cp_r, rho_r, Tr, npipes, node_pipes_in, node_pipes_out, pipe_nodes,...
     xtotal,d) 
 
+% More (debug?) output? --> Set verbose to 1.
+verbose = 0;
+
 % Solve for T in mine system: 
 Tnsolved = zeros(nn+no,1);  % Array to track if node has been solved yet.
 Tpsolved = zeros(np,1);
@@ -13,7 +16,7 @@ Tp = zeros(np, 2);
 % Impose inflow temperature on nodes that have external inflow
 % (which will be updated later with T from inflowing pipes if applicable)
 weighted_flow_in = zeros(np,1);
-Qmax = max(abs(Q))
+Qmax = max(abs(Q));
 for inode = 1:nn+no
     sumQ = 0.;
     sumQin = 0.;
@@ -49,9 +52,7 @@ end
 nitmax=100;
 nit=0;
 while (nnsolved<nn+no & nit<nitmax)  % Not all node T's have been solved: continue
-    nit=nit+1
-    disp('Number of node temperatures solved:')
-    disp(nnsolved)
+    nit=nit+1;
     for in=1:nn+no      % loop over all nodes 
         if Tnsolved(in)>=npipes(1,in)   %
             % T in this node known: start process of projecting T downstream:
@@ -78,6 +79,9 @@ while (nnsolved<nn+no & nit<nitmax)  % Not all node T's have been solved: contin
                 end                
             end            
         end   
+    end
+    if (verbose) 
+        disp(['Number of node temperatures solved:' num2str(nnsolved) '/' num2str(nn+no)])
     end
 end
 

@@ -29,8 +29,8 @@ for inode = 1:nn+no
     end
     sumQ = sumQin - sumQout;
     if (sumQ/Qmax<-1e-6) % significant external inflow at node: 
-        Tn(inode)=Tf_ini   % Give all these nodes initial inflow T at first
         external_inflow = -sumQ;
+        Tn(inode)=Tf_ini*external_inflow/(sumQin+external_inflow);  % Give all these nodes initial inflow T at first
     end
     % If more than 1 pipe flows into node, then T of node will be a weighted
     % average of the T of those inflowing pipes.
@@ -49,9 +49,8 @@ end
 nitmax=100;
 nit=0;
 while (nnsolved<nn+no & nit<nitmax)  % Not all node T's have been solved: continue
-    nit=nit+1
-    disp('Number of node temperatures solved:')
-    disp(nnsolved)
+    nit=nit+1;
+    disp(['Number of node temperatures solved:' num2str(nnsolved)])
     for in=1:nn+no      % loop over all nodes 
         if Tnsolved(in)>=npipes(1,in)   %
             % T in this node known: start process of projecting T downstream:

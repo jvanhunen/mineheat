@@ -87,6 +87,6 @@ elseif igeom==102
     Ho(1)  = 5e-12; % only-fixed-head node is in middle.
     % set any external in/outflow for each (non-fixed) node:
     q    = zeros(nn,1);
-    q(1) = -1.575e-4;  % prescribed external flow into first node 
-    q(nn) = 1.575e-4;  % prescribed external flow out of last node 
+    q(2) = -1.575e-4;  % prescribed external flow into first node 
+    q(nn-1) = 1.575e-4;  % prescribed external flow out of last node 
 end

@@ -17,20 +17,25 @@ clear
 % 
 % Jeroen van Hunen
 
+% More (debug?) output? --> Set verbose to 1.
+verbose = 1;
+
 % To check if the code was broken during any recent updates, several testbank options are available: 
 % 0 = no testing
-igeom = 2;
-testbank = 1; %  0 = no testing 
+igeom = 7;
+testbank = 0; %  0 = no testing 
 %             % -1 = create to testbank results 
 %             %      (NB do NOT use to check your newest code version!)
 %             %  1 = testing your latest results against testbank results
 if testbank == 0
     ntests = 1;
     alltests = igeom;
+    disp (['mineheat: running + plotting geometry ',num2str(igeom),'.'])
 elseif testbank == -1 || testbank == 1
     ntests = 9;
     alltests  = zeros(ntests,1);
     alltests  = [1 2 3 4 5 6 7 101 102];
+    disp (['mineheat: Testbank: testing geometries ',num2str(alltests),'.'])
 end
 
 for igeom = alltests
@@ -74,15 +79,16 @@ for igeom = alltests
     [H Q]  = mineflow(nn, no, np, x, xo, A12, A10, Ho, q, L, d);
 
     %%% Setup pipe flow arrays:
-    [pipe_nodes npipes node_pipes_out node_pipes_in weighted_flow_in Q] ...
-           = mine_array_setup(np, nn, no, A10, A12, pipe_nodes, Q);
+    [pipe_nodes npipes node_pipes_out node_pipes_in Q] ...
+           = mine_array_setup(np, nn, no, A10, A12, pipe_nodes, q, Q);
 
     %%% Calculate temperature of pipe system:
     % set time at 'nyear' years:
     t      = 3600*24*365*nyrs;
     v      = Q ./ (pi*r.^2);
-    [Tn Tp]= mine_heat(t, r, L, v, np, nn, no, Tf_ini, k_r, Cp_r, rho_r,...
-        Tr, npipes, node_pipes_out, pipe_nodes, weighted_flow_in,xtotal,d);
+
+    [Tn Tp]= mine_heat(t, r, L, Q, v, np, nn, no, Tf_ini, k_r, Cp_r, rho_r,...
+        Tr, npipes, node_pipes_in, node_pipes_out, pipe_nodes,xtotal,d);
     % Output of routine mine_heat: 
     % - Tn, ordered as [x0;x] (i.e. first all fixed-head nodes, then the others
     % - Tp, as np-by-2 array, with Tp(:,1)=inflow T of pipe, and Tp(:,2) the
@@ -97,14 +103,22 @@ for igeom = alltests
         Tpstore = Tp;
         save(savefile,'Hstore', 'Qstore', 'Tnstore', 'Tpstore')
     elseif testbank == 1
-        loadfile = ['testbank/testbank_' num2str(igeom) '.mat']
+        loadfile = ['testbank/testbank_' num2str(igeom) '.mat'];
+        if verbose
+            disp (['   --> Tested geometry ',num2str(igeom),':'])
+        end
         load(loadfile,'Hstore', 'Qstore', 'Tnstore', 'Tpstore')
         Hdiff = H - Hstore;
         Qdiff = Q - Qstore;
         Tndiff = Tn - Tnstore;
         Tpdiff = Tp - Tpstore;
-        if max(Hdiff) > 0 
-            disp('geometry ' num2str(igeom) ' failed:
+        if (max(Hdiff) > 0 | max(Qdiff) > 0 | max(Tndiff) > 0 | max(Tpdiff) > 0)
+            disp(['geometry ', num2str(igeom), ' failed:'])
+            Hdiff
+            Qdiff
+            Tndiff
+            Tpdiff
+        end
     end
 end
 
@@ -217,7 +231,8 @@ if testbank == 0  % only plot results when not performing testbank tasks:
             title(hcb,'H(m)')
             view(2)
         end
-
+    
+    if (igeom ==1 | igeom=101 | igeom=102
     figure(4), clf
         x = xtotal(:,1);    % x-coordinates
         hold on
@@ -229,10 +244,7 @@ if testbank == 0  % only plot results when not performing testbank tasks:
 
     %view(3)
     drawnow
-
-    disp (' ')
-    disp ('Output temperature:')
-    Tout = Tn(2);
-    disp ('Flow rate, Litres per second:')
-    Qout = Q(1); %(Q(96)+Q(97))*10^3;
+    
+    disp (['Max node temperature = ', num2str(max(abs(Tn))), ' degC'])
+    disp (['Max flow rate = ', num2str(1e3*max(abs(Q))), ' litres/sec'])
 end

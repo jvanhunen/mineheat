@@ -27,7 +27,6 @@ A21  = A12';
 
 % Start iterative calculation using Newton method: 
 sumdQrel=1e10;
-figure(1), clf
 while (sumdQrel>1e-8)
     for ip=1:np
         % calc resistance coeff using Darcy-Weisbach formula

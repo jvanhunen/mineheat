@@ -17,20 +17,25 @@ clear
 % 
 % Jeroen van Hunen
 
+% More (debug?) output? --> Set verbose to 1.
+verbose = 1;
+
 % To check if the code was broken during any recent updates, several testbank options are available: 
 % 0 = no testing
-igeom = 2;
-testbank = 1; %  0 = no testing 
+igeom = 5;
+testbank = 0; %  0 = no testing 
 %             % -1 = create to testbank results 
 %             %      (NB do NOT use to check your newest code version!)
 %             %  1 = testing your latest results against testbank results
 if testbank == 0
     ntests = 1;
     alltests = igeom;
+    disp (['mineheat: running + plotting geometry ',num2str(igeom),'.'])
 elseif testbank == -1 || testbank == 1
     ntests = 9;
     alltests  = zeros(ntests,1);
     alltests  = [1 2 3 4 5 6 7 101 102];
+    disp (['mineheat: Testbank: testing geometries ',num2str(alltests),'.'])
 end
 
 for igeom = alltests
@@ -98,18 +103,23 @@ for igeom = alltests
         Tpstore = Tp;
         save(savefile,'Hstore', 'Qstore', 'Tnstore', 'Tpstore')
     elseif testbank == 1
-        loadfile = ['testbank/testbank_' num2str(igeom) '.mat']
+        loadfile = ['testbank/testbank_' num2str(igeom) '.mat'];
+        if verbose
+            disp (['   --> Tested geometry ',num2str(igeom),':'])
+        end
         load(loadfile,'Hstore', 'Qstore', 'Tnstore', 'Tpstore')
         Hdiff = H - Hstore;
         Qdiff = Q - Qstore;
         Tndiff = Tn - Tnstore;
         Tpdiff = Tp - Tpstore;
         if (max(Hdiff) > 0 | max(Qdiff) > 0 | max(Tndiff) > 0 | max(Tpdiff) > 0)
-            disp(['geometry ', num2str(igeom), ' failed:'])
+            disp (['       failed: Differences in H, Q, Tn, and Tp:'])
             Hdiff
             Qdiff
             Tndiff
             Tpdiff
+        else
+            disp ('       passed')
         end
     end
 end
@@ -223,22 +233,20 @@ if testbank == 0  % only plot results when not performing testbank tasks:
             title(hcb,'H(m)')
             view(2)
         end
+    
+    if igeom ==1 | igeom==101 | igeom==102
+        figure(4), clf
+            x = xtotal(:,1);    % x-coordinates
+            hold on
+            Tnmax = max(Tn); Tnmin = min(Tn); dTn=(max(1e-30,Tnmax-Tnmin)); Tnondim = (Tn-Tnmin)/dTn;
+            plot(x,Tnondim,'o');
+            Hmax = max(Htotal); Hmin = min(Htotal); dH=(max(1e-30,Hmax-Hmin)); Hnondim = (Htotal-Hmin)/dH;
+            plot(x,Hnondim,'x');
+            title(['Hmin= ', num2str(Hmin), ', Hmax= ', num2str(Hmax), ', Tmin= ', num2str(Tnmin), ', Tmax= ', num2str(Tnmax)]);
+    end
 
-    figure(4), clf
-        x = xtotal(:,1);    % x-coordinates
-        hold on
-        Tnmax = max(Tn); Tnmin = min(Tn); dTn=(max(1e-30,Tnmax-Tnmin)); Tnondim = (Tn-Tnmin)/dTn;
-        plot(x,Tnondim,'o');
-        Hmax = max(Htotal); Hmin = min(Htotal); dH=(max(1e-30,Hmax-Hmin)); Hnondim = (Htotal-Hmin)/dH;
-        plot(x,Hnondim,'x');
-        title(['Hmin= ', num2str(Hmin), ', Hmax= ', num2str(Hmax), ', Tmin= ', num2str(Tnmin), ', Tmax= ', num2str(Tnmax)]);
-
-    %view(3)
     drawnow
-
-    disp (' ')
-    disp ('Output temperature:')
-    Tout = Tn(2);
-    disp ('Flow rate, Litres per second:')
-    Qout = Q(1); %(Q(96)+Q(97))*10^3;
+    
+    disp (['Max node temperature = ', num2str(max(abs(Tn))), ' degC'])
+    disp (['Max flow rate = ', num2str(1e3*max(abs(Q))), ' litres/sec'])
 end
