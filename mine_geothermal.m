@@ -11,6 +11,7 @@ clear
 % - benchark in Loredo et al, 2017
 % 
 % Version: 
+% 20210609 - added igeom 101 and 102 to test prescribed in/outflow
 % 20210518 - merging different codes into a signle master version   
 % 20190628 - code split up in separate subfunctions
 % 
@@ -103,7 +104,7 @@ elseif igeom==101
     Ho(1)  = 0; % only-fixed-head node is extraction node.
     % set any external in/outflow for each (non-fixed) node:
     q    = zeros(nn,1);
-    q(1) = -1.575e-4;  % external flow into first node prescribed
+    q(1) = -1.575e-4;  % prescribed external flow into first node 
 elseif igeom==102
     % linear pipesystem with one fixed head, and two prescribed in/outflow points:
     [nn, no, np, A12, A10, xo, x, d] = geometry102();
@@ -118,7 +119,9 @@ end
 r      = d/2;
 
 % Array with start & end node of each pipe:
-pipe_nodes  = zeros(np,2);   % array to store start & end node of each pipe
+pipe_nodes  = zeros(np,2);  % array to store start & end node of each pipe
+                            % note the 'global' node numbering, including
+                            %    fixed and free head nodes
 A102 = [A10 A12];           % merges table of fixed (A10) and unknown (A12) nodes
 [row,col] = find(A102==-1); % node with -1 indicates one end point of pipe
 pipe_nodes(row,1) = col;    % store that node nr in pipe_nodes array
@@ -142,7 +145,6 @@ Tin    = Tf_ini*ones(np,1);
 
 % Calculate flow through pipe system:
 [H Q]  = mineflow(nn, no, np, x, xo, A12, A10, Ho, q, L, d);
-Q
 
 %%% Setup pipe flow arrays:
 [pipe_nodes npipes node_pipes_out node_pipes_in weighted_flow_in Q] ...
