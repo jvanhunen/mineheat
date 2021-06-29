@@ -3,7 +3,6 @@ function [nn, no, np, A12, A10, xo, x, d, Ho, q] = geometries(igeom)
 %  - geometry (node locations & pipe connections) in function geometryX
 %  - fixed hydraulic heads of all nodes xo
 %  - external in/outflow for all nodes x 
-%  - NB: external in/outflow on fixed-node heads not implemented (yet)!
 
 head   = 1e-11;     % hydraulic head loss through mine (m). e.g. 6.3e-12 
 
@@ -88,6 +87,21 @@ elseif igeom==102
     Ho(1)  = 5e-12; % only-fixed-head node is in middle.
     % set any external in/outflow for each (non-fixed) node:
     q    = zeros(nn,1);
-    q(1) = -1.575e-4;  % prescribed external flow into first node 
-    q(nn) = 1.575e-4;  % prescribed external flow out of last node 
+    q(2) = -1.575e-4;  % prescribed external flow into first node 
+    q(nn-1) = 1.575e-4;  % prescribed external flow out of last node 
+elseif igeom==103
+    % large grid (diss Marijn Huis):
+    n  = 10;   % grid width (number of nodes wide)
+    m  = 15;   % grid height (number of nodes high)
+    l1 = 100;  % length of horizontal pipes
+    l2 = 100;  % length of vertical pipes
+    [nn, no, np, A12, A10, xo, x, d] = geometry103(n , m, l1, l2);
+    % set fixed hydraulic heads:
+    Ho     = zeros(no,1);
+    Ho(1)  = 0;
+    % set any external in/outflow for each (non-fixed) node:
+    q    = zeros(nn,1);
+    q(1) = -1e-2;  % prescribed external flow into first node 
+    q(71) = 1e-2;
+    q(30
 end

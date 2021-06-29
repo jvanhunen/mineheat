@@ -22,7 +22,7 @@ verbose = 1;
 
 % To check if the code was broken during any recent updates, several testbank options are available: 
 % 0 = no testing
-igeom = 5;
+igeom = 103;
 testbank = 0; %  0 = no testing 
 %             % -1 = create to testbank results 
 %             %      (NB do NOT use to check your newest code version!)

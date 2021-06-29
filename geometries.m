@@ -89,4 +89,20 @@ elseif igeom==102
     q    = zeros(nn,1);
     q(2) = -1.575e-4;  % prescribed external flow into first node 
     q(nn-1) = 1.575e-4;  % prescribed external flow out of last node 
+elseif igeom==103
+    % large grid (diss Marijn Huis):
+    n  = 10;   % grid width (number of nodes wide)
+    m  = 15;   % grid height (number of nodes high)
+    l1 = 100;  % length of horizontal pipes
+    l2 = 100;  % length of vertical pipes
+    [nn, no, np, A12, A10, xo, x, d] = geometry103(n , m, l1, l2);
+    % set fixed hydraulic heads:
+    Ho     = zeros(no,1);
+    Ho(1)  = 0;
+    % set any external in/outflow for each (non-fixed) node:
+    q    = zeros(nn,1);
+    q(3) = -1e-2; 
+    q(73) = 1e-2;
+    q(78) = -1e-2; 
+    q(148) = 1e-2;
 end

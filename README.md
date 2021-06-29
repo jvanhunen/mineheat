@@ -31,3 +31,5 @@ Update 20210629 JvH:
   code seems to create identical results for all presently available geometries
 - merged heat_inflow branch into main
 - cleaned up code
+- added igeom=103 (geometry103.m): as igeom5 (geometry_grid), but now with
+  in/outflow arranged through q, while keeping only one fixed-head node in top-right corner
