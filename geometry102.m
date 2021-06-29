@@ -29,10 +29,9 @@ x   = zeros(nn,2);
 % locations of nodes:
 segment_length = total_length/np;   % e.g. 10 for 1km pipe
 xo(1,:) = [5*segment_length 0];
-x1(:,1)=linspace(0, 4*segment_length, 5)'
-x2(:,1)=linspace(6*segment_length, 10*segment_length, 5)'
-x(:,1)=[x1; x2]
-xo
+x1(:,1)=linspace(0, 4*segment_length, 5)';
+x2(:,1)=linspace(6*segment_length, 10*segment_length, 5)';
+x(:,1)=[x1; x2];
 
 % General definition of matrix A12 (and A10): 
 %    A12(ip,in) = if    
@@ -57,9 +56,6 @@ A12(np,nn) = 1;
 % middle node is the ony fixed-head node
 A10(5,1) = 1;
 A10(6,1) = -1;
-
-A10
-A12
 
 % pipe diameters: 
 d   = 2*ones(np,1);

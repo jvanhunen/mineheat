@@ -103,13 +103,8 @@ for igeom = alltests
         Qdiff = Q - Qstore;
         Tndiff = Tn - Tnstore;
         Tpdiff = Tp - Tpstore;
-        if (max(Hdiff) > 0 | max(Qdiff) > 0 | max(Tndiff) > 0 | max(Tpdiff) > 0)
-            disp(['geometry ', num2str(igeom), ' failed:'])
-            Hdiff
-            Qdiff
-            Tndiff
-            Tpdiff
-        end
+        if max(Hdiff) > 0 
+            disp('geometry ' num2str(igeom) ' failed:
     end
 end
 
