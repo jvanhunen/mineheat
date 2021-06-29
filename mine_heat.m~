@@ -29,8 +29,8 @@ for inode = 1:nn+no
     end
     sumQ = sumQin - sumQout;
     if (sumQ/Qmax<-1e-6) % significant external inflow at node: 
+        Tn(inode)=Tf_ini   % Give all these nodes initial inflow T at first
         external_inflow = -sumQ;
-        Tn(inode)=Tf_ini*external_inflow/(sumQin+external_inflow);  % Give all these nodes initial inflow T at first
     end
     % If more than 1 pipe flows into node, then T of node will be a weighted
     % average of the T of those inflowing pipes.

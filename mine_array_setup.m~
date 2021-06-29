@@ -1,4 +1,4 @@
-function [pipe_nodes npipes node_pipes_out node_pipes_in Q] ...
+function [pipe_nodes npipes node_pipes_out node_pipes_in weighted_flow_in Q] ...
           = mine_array_setup(np, nn, no, A10, A12, pipe_nodes, q, Q) 
 %%% Set up index arrays
 
@@ -28,6 +28,7 @@ end
 % Create arrays to list all pipes entering/exiting every node:
 maxnpipes_in   =(max(npipes(1,:)));
 node_pipes_in  = zeros(maxnpipes_in+1,nn+no); % add 1 to maxnpipes_in to allow for potential external inflow (stored in array q)
+weighted_flow_in = zeros(np,1);
 maxnpipes_out  =(max(npipes(2,:)));
 node_pipes_out = zeros(maxnpipes_out,nn+no);
 
@@ -94,6 +95,40 @@ for inode = 1:nn
                 end
             end
         end   
+    end
+end
+
+Qmax = max(abs(Q))
+for inode = 1:nn+no
+    disp (['Node nr' num2str(inode)])
+    %node_pipes_in(:,inode)
+    npipe_in = npipes(1,inode);
+    if npipe_in>0
+        sumQin = sum(Q(node_pipes_in(1:npipe_in,inode)));
+    else
+        sumQin=0.;
+    end
+    npipe_out = npipes(2,inode);
+    if npipe_out>0
+        sumQin = sumQin - sum(Q(node_pipes_out(1:npipe_out,inode)));
+    end
+    sumQin
+        
+end
+
+% If more than 1 pipe flows into node, then T of node will be a weighted
+% average of the T of those inflowing pipes.
+% Those weights are stored in weighted_flow_in
+for inode = 1:nn+no
+    Qtotal = 0;
+    npipe_in = npipes(1,inode);
+    if (npipe_in>0)
+        for ipipe = 1: npipe_in
+            Qtotal = Qtotal + Q(node_pipes_in(ipipe,inode));
+        end
+        for ipipe = 1: npipe_in
+            weighted_flow_in(node_pipes_in(ipipe,inode)) = Q(node_pipes_in(ipipe,inode))/Qtotal;
+        end
     end
 end
 

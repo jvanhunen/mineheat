@@ -74,15 +74,16 @@ for igeom = alltests
     [H Q]  = mineflow(nn, no, np, x, xo, A12, A10, Ho, q, L, d);
 
     %%% Setup pipe flow arrays:
-    [pipe_nodes npipes node_pipes_out node_pipes_in weighted_flow_in Q] ...
-           = mine_array_setup(np, nn, no, A10, A12, pipe_nodes, Q);
+    [pipe_nodes npipes node_pipes_out node_pipes_in Q] ...
+           = mine_array_setup(np, nn, no, A10, A12, pipe_nodes, q, Q);
 
     %%% Calculate temperature of pipe system:
     % set time at 'nyear' years:
     t      = 3600*24*365*nyrs;
     v      = Q ./ (pi*r.^2);
-    [Tn Tp]= mine_heat(t, r, L, v, np, nn, no, Tf_ini, k_r, Cp_r, rho_r,...
-        Tr, npipes, node_pipes_out, pipe_nodes, weighted_flow_in,xtotal,d);
+
+    [Tn Tp]= mine_heat(t, r, L, Q, v, np, nn, no, Tf_ini, k_r, Cp_r, rho_r,...
+        Tr, npipes, node_pipes_in, node_pipes_out, pipe_nodes,xtotal,d);
     % Output of routine mine_heat: 
     % - Tn, ordered as [x0;x] (i.e. first all fixed-head nodes, then the others
     % - Tp, as np-by-2 array, with Tp(:,1)=inflow T of pipe, and Tp(:,2) the

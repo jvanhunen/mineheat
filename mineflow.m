@@ -29,7 +29,6 @@ A21  = A12';
 sumdQrel=1e10;
 figure(1), clf
 while (sumdQrel>1e-8)
-    sumdQrel
     for ip=1:np
         % calc resistance coeff using Darcy-Weisbach formula
         %    (EPANET manual p.30 & Table 3.1)
