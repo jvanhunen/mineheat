@@ -18,7 +18,7 @@ clear
 % Jeroen van Hunen
 
 % Set constant input parameters:
-igeom  = 102;        % pipe geometry option
+igeom  = 2;        % pipe geometry option
 Tf_ini = 3;        % water inflow temperature (degC) 
 nyrs   = 1;        % flow duration (yrs)
 head   = 1e-11;     % hydraulic head loss through mine (m). e.g. 6.3e-12 
@@ -147,15 +147,15 @@ Tin    = Tf_ini*ones(np,1);
 [H Q]  = mineflow(nn, no, np, x, xo, A12, A10, Ho, q, L, d);
 
 %%% Setup pipe flow arrays:
-[pipe_nodes npipes node_pipes_out node_pipes_in weighted_flow_in Q] ...
-       = mine_array_setup(np, nn, no, A10, A12, pipe_nodes, Q);
+[pipe_nodes npipes node_pipes_out node_pipes_in Q] ...
+       = mine_array_setup(np, nn, no, A10, A12, pipe_nodes, q, Q);
 
 %%% Calculate temperature of pipe system:
 % set time at 'nyear' years:
 t      = 3600*24*365*nyrs;
 v      = Q ./ (pi*r.^2);
-[Tn Tp]= mine_heat(t, r, L, v, np, nn, no, Tf_ini, k_r, Cp_r, rho_r,...
-    Tr, npipes, node_pipes_out, pipe_nodes, weighted_flow_in,xtotal,d);
+[Tn Tp]= mine_heat(t, r, L, Q, v, np, nn, no, Tf_ini, k_r, Cp_r, rho_r,...
+    Tr, npipes, node_pipes_in, node_pipes_out, pipe_nodes,xtotal,d);
 % Output of routine mine_heat: 
 % - Tn, ordered as [x0;x] (i.e. first all fixed-head nodes, then the others
 % - Tp, as np-by-2 array, with Tp(:,1)=inflow T of pipe, and Tp(:,2) the
@@ -278,7 +278,12 @@ figure(4), clf
     plot(x,Hnondim,'x');
     title(['Hmin= ', num2str(Hmin), ', Hmax= ', num2str(Hmax), ', Tmin= ', num2str(Tnmin), ', Tmax= ', num2str(Tnmax)]);
 
-%view(3)
+figure(5), clf
+    x = xtotal(:,1);    % x-coordinates
+    plot(x,Tn,'o');
+    ylabel('T(degC)');
+    
+    %view(3)
 drawnow
 
 disp (' ')
