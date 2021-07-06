@@ -26,7 +26,7 @@ verbose = 1;
 igeom = 103;
 
 % Testbank options to check if the code was broken during recent update: 
-testbank = -1; %  0 = no testing, use igeom above
+testbank = 0; %  0 = no testing, use igeom above
 %             % -1 = create testbank benchmark results 
 %             %  1 = testing your latest code against testbank results
 if testbank == 0
