@@ -1,9 +1,11 @@
-function [Tn Tp] = mine_heat(t, r, L, Q, v, np, nn, no, Tf_ini,...
+function [Tn Tp] = mine_heat(t, d, L, Q, v, np, nn, no, Tf_ini,...
     k_r, Cp_r, rho_r, Tr, npipes, node_pipes_in, node_pipes_out, pipe_nodes,...
-    xtotal,d) 
+    xtotal) 
 
-% More (debug?) output? --> Set verbose to 1.
+% More output needed? --> Set verbose to 1.
 verbose = 0;
+
+r=d/2;
 
 % Solve for T in mine system: 
 Tnsolved = zeros(nn+no,1);  % Array to track if node has been solved yet.
@@ -51,7 +53,7 @@ end
 
 nitmax=100;
 nit=0;
-while (nnsolved<nn+no & nit<nitmax)  % Not all node T's have been solved: continue
+while (nnsolved<nn+no && nit<nitmax)  % Not all node T's have been solved: continue
     nit=nit+1;
     for in=1:nn+no      % loop over all nodes 
         if Tnsolved(in)>=npipes(1,in)   %

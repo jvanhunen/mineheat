@@ -11,6 +11,8 @@ clear
 % - benchark in Loredo et al, 2017
 % 
 % Version: 
+% 20210630 - added testbank
+% 20210628 - added igeom 103 for grid with multiple extraction schemes
 % 20210609 - added igeom 101 and 102 to test prescribed in/outflow
 % 20210518 - merging different codes into a signle master version   
 % 20190628 - code split up in separate subfunctions
@@ -20,30 +22,29 @@ clear
 % More (debug?) output? --> Set verbose to 1.
 verbose = 1;
 
-% To check if the code was broken during any recent updates, several testbank options are available: 
-% 0 = no testing
+% Geometry used for calculation (not used if testbank!=0):
 igeom = 103;
-testbank = 0; %  0 = no testing 
-%             % -1 = create to testbank results 
-%             %      (NB do NOT use to check your newest code version!)
-%             %  1 = testing your latest results against testbank results
+
+% Testbank options to check if the code was broken during recent update: 
+testbank = -1; %  0 = no testing, use igeom above
+%             % -1 = create testbank benchmark results 
+%             %  1 = testing your latest code against testbank results
 if testbank == 0
     ntests = 1;
     alltests = igeom;
     disp (['mineheat: running + plotting geometry ',num2str(igeom),'.'])
 elseif testbank == -1 || testbank == 1
-    ntests = 9;
+    ntests = 10;
     alltests  = zeros(ntests,1);
-    alltests  = [1 2 3 4 5 6 7 101 102];
+    alltests  = [1 2 3 4 5 6 7 101 102 103];
     disp (['mineheat: Testbank: testing geometries ',num2str(alltests),'.'])
 end
 
 for igeom = alltests
     % read in geometries:
     [nn, no, np, A12, A10, xo, x, d, Ho, q] = geometries(igeom);
-    r = d/2;
 
-    % Set constant input parameters:
+    % Set constant physical and model input parameters:
     Tf_ini = 3;        % water inflow temperature (degC) 
     nyrs   = 1;        % flow duration (yrs)
     k_r    = 3.0;      % thermal conductivity
@@ -85,10 +86,10 @@ for igeom = alltests
     %%% Calculate temperature of pipe system:
     % set time at 'nyear' years:
     t      = 3600*24*365*nyrs;
-    v      = Q ./ (pi*r.^2);
+    v      = Q ./ (pi*(d/2).^2);
 
-    [Tn Tp]= mine_heat(t, r, L, Q, v, np, nn, no, Tf_ini, k_r, Cp_r, rho_r,...
-        Tr, npipes, node_pipes_in, node_pipes_out, pipe_nodes,xtotal,d);
+    [Tn Tp]= mine_heat(t, d, L, Q, v, np, nn, no, Tf_ini, k_r, Cp_r, rho_r,...
+        Tr, npipes, node_pipes_in, node_pipes_out, pipe_nodes,xtotal);
     % Output of routine mine_heat: 
     % - Tn, ordered as [x0;x] (i.e. first all fixed-head nodes, then the others
     % - Tp, as np-by-2 array, with Tp(:,1)=inflow T of pipe, and Tp(:,2) the
@@ -124,129 +125,7 @@ for igeom = alltests
     end
 end
 
-% PLOT RESULTS:
-% =============
+% plot results: 
 if testbank == 0  % only plot results when not performing testbank tasks:
-    dplot = 2;   % Thickness of pipe segments in plot
-    
-    figure(1), clf
-        axis equal
-        xlabel('x(m)')
-        ylabel('y(m)')
-        xtotal = [xo; x];
-        dmax = max(d);
-        %subplot(3,1,1)
-            grid on
-            hold on 
-            colormap(jet)
-            caxis([min(min(Tp)) max(max(Tp))]);
-            for ip = 1:np
-                x1 = xtotal(pipe_nodes(ip,1),1);
-                x2 = xtotal(pipe_nodes(ip,2),1);
-                y1 = xtotal(pipe_nodes(ip,1),2);
-                y2 = xtotal(pipe_nodes(ip,2),2);
-                T1 = Tp(ip,1);
-                T2 = Tp(ip,2);
-                z1 = 0;
-                z2 = 0;
-                x = [x1 x2];
-                y = [y1 y2];
-                z = [z1 z2];
-                col = [T1 T2];
-                surface([x;x],[y;y],[z;z],[col;col],... 
-                        'facecol','no',... 
-                        'edgecol','interp',...
-                        'linew',d(ip)/dmax*dplot);
-                if (nn<20) 
-                    plot(xtotal(:,1), xtotal(:,2),'ko','MarkerSize',10,'MarkerFaceColor', 'k')
-                end
-                hcb = colorbar;
-                title(hcb,'T(^oC)')
-                %view(2)
-            end
-    figure(2), clf
-        axis equal
-        hold on 
-        grid on
-        colormap(jet)
-        minQ = min(Q);
-        maxQ = max(Q);
-        dQ = maxQ-minQ;
-        if (abs(dQ/maxQ)<0.01)
-            eps = abs(0.01*maxQ);
-        else
-            eps = 0;
-        end
-        caxis([minQ-eps maxQ+eps]);
-        for ip = 1:np
-            x1 = xtotal(pipe_nodes(ip,1),1);
-            x2 = xtotal(pipe_nodes(ip,2),1);
-            y1 = xtotal(pipe_nodes(ip,1),2);
-            y2 = xtotal(pipe_nodes(ip,2),2);
-            z1 = 0;
-            z2 = 0;
-            x = [x1 x2];
-            y = [y1 y2];
-            z = [z1 z2];
-            col = [Q(ip) Q(ip)];
-            surface([x;x],[y;y],[z;z],[col;col],... 
-                    'facecol','no',... 
-                    'edgecol','interp',...
-                    'linew',d(ip)/dmax*dplot);
-            if (nn<20) 
-                plot(xtotal(:,1), xtotal(:,2),'ko','MarkerSize',10,'MarkerFaceColor', 'k')
-            end
-            hcb = colorbar;
-            title(hcb,'Q(m^3/sec)')
-            view(2)
-        end
-
-    figure(3), clf
-        axis equal
-        grid on
-        hold on 
-        colormap(jet)
-        Htotal = [Ho; H];
-        caxis([min(min(Htotal)) max(max(Htotal))]);
-        %caxis([0.3 0.6]);
-        for ip = 1:np
-            x1 = xtotal(pipe_nodes(ip,1),1);
-            x2 = xtotal(pipe_nodes(ip,2),1);
-            y1 = xtotal(pipe_nodes(ip,1),2);
-            y2 = xtotal(pipe_nodes(ip,2),2);
-            H1 = Htotal(pipe_nodes(ip,1));
-            H2 = Htotal(pipe_nodes(ip,2));
-            z1 = 0;
-            z2 = 0;
-            x = [x1 x2];
-            y = [y1 y2];
-            z = [z1 z2];
-            col = [H1 H2];
-            surface([x;x],[y;y],[z;z],[col;col],... 
-                    'facecol','no',... 
-                    'edgecol','interp',...
-                    'linew',d(ip)/dmax*dplot);
-            if (nn<20) 
-                plot(xtotal(:,1), xtotal(:,2),'ko','MarkerSize',10,'MarkerFaceColor', 'k')
-            end
-            hcb = colorbar;
-            title(hcb,'H(m)')
-            view(2)
-        end
-    
-    if igeom ==1 | igeom==101 | igeom==102
-        figure(4), clf
-            x = xtotal(:,1);    % x-coordinates
-            hold on
-            Tnmax = max(Tn); Tnmin = min(Tn); dTn=(max(1e-30,Tnmax-Tnmin)); Tnondim = (Tn-Tnmin)/dTn;
-            plot(x,Tnondim,'o');
-            Hmax = max(Htotal); Hmin = min(Htotal); dH=(max(1e-30,Hmax-Hmin)); Hnondim = (Htotal-Hmin)/dH;
-            plot(x,Hnondim,'x');
-            title(['Hmin= ', num2str(Hmin), ', Hmax= ', num2str(Hmax), ', Tmin= ', num2str(Tnmin), ', Tmax= ', num2str(Tnmax)]);
-    end
-
-    drawnow
-    
-    disp (['Max node temperature = ', num2str(max(abs(Tn))), ' degC'])
-    disp (['Max flow rate = ', num2str(1e3*max(abs(Q))), ' litres/sec'])
+    mine_plots (igeom, xo, x, d, np, nn, pipe_nodes, Tp, Tn, Q, H, Ho)
 end

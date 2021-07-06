@@ -4,7 +4,7 @@ function [nn, no, np, A12, A10, xo, x, d, Ho, q] = geometries(igeom)
 %  - fixed hydraulic heads of all nodes xo
 %  - external in/outflow for all nodes x 
 
-head   = 1e-11;     % hydraulic head loss through mine (m). e.g. 6.3e-12 
+head   = 1e-7;     % hydraulic head loss through mine (m). e.g. 6.3e-12 
 
 if igeom==1
     % linear pipesystem:
@@ -63,7 +63,7 @@ elseif igeom==7
     % Hawthorn model (ESII 20/21): 
     igeomH = 1;
     optionH = 1;
-    diam = 4.0;
+    diam = 3.0;
     [nn, no, np, A12, A10, xo, x, d] = hawthorn_model(diam,igeomH,optionH);
     % set fixed hydraulic heads:
     Ho     = zeros(no,1);
@@ -101,8 +101,8 @@ elseif igeom==103
     Ho(1)  = 0;
     % set any external in/outflow for each (non-fixed) node:
     q    = zeros(nn,1);
-    q(3) = -1e-2; 
-    q(73) = 1e-2;
-    q(78) = -1e-2; 
-    q(148) = 1e-2;
+    q(3) = -1e-1; 
+    q(73) = 1e-1;
+    q(78) = -1e-1; 
+    q(148) = 1e-1;
 end

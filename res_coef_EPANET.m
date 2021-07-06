@@ -1,4 +1,4 @@
-function r = res_coef_Brown03(Q,L,d)
+function r = res_coef_EPANET(Q,L,d)
    % Calculating resistance coeff of a pipe:
    %      r = 0.0252 ft2m^5 f(eps,d,Q) d^-5 L
    %      with: ft2m = length of foot in metres (0.3048)
@@ -18,7 +18,9 @@ function r = res_coef_Brown03(Q,L,d)
    % Reynolds number = rho*v*d/mu, with v=Q/(pi*r^2) = 4*Q/(pi*d^2)
    %    (for flow in pipe, see https://en.wikipedia.org/wiki/Reynolds_number)
    Re  = rho*abs(4*Q/(3.1415*d^2))*d/mu;
+   ft2m5 = (0.3048)^5 % (length of foot in metres)^6
    f = pipe_friction_factor(Re, d, eps)
-   pi=3.141592
-   r = f*8/(pi^2*g)*L/d^5
+   d
+   L
+   r = 0.0252*ft2m5*f*d^-5*L
 end

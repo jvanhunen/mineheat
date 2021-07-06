@@ -71,11 +71,11 @@ no=1;
 nn=nn-1;
 A12(:,n*m)= [];
 x(n*m,:)  = [];
-x
-xo
-A12
-A10
-size(A12)
+% x
+% xo
+% A12
+% A10
+% size(A12)
 
 % pipe diameters:
-d   = 4*ones(np,1);
+d   = 2*ones(np,1);

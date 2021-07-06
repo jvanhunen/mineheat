@@ -13,7 +13,7 @@ function f = pipe_friction_factor(Re, d, eps)
         % laminar regime:
         f=64/Re;
     elseif Re>4000
-        % turbulent regime (from Bhave, 1991):
+        % turbulent regime, Swamee–Jain equation (from Bhave, 1991):
         % Note that, unlike stated in EPANET manual, the log used in (only)
         %   this formula should be a log10, not an ln, hence the log(10)^2 
         %   to compensate for that. 

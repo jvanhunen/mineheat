@@ -31,7 +31,8 @@ while (sumdQrel>1e-8)
     for ip=1:np
         % calc resistance coeff using Darcy-Weisbach formula
         %    (EPANET manual p.30 & Table 3.1)
-        r(ip) = res_coef(Q(ip),L(ip),d(ip)); 
+        % r(ip) = res_coef_EPANET(Q(ip),L(ip),d(ip)); 
+        r(ip) = res_coef_Brown03(Q(ip),L(ip),d(ip)); 
         % Inverse of A11 as in Eqn 7 of (Todini&Paliti, 1987) 
         A11inv(ip,ip) = (r(ip)*(abs(Q(ip)))^(B-1))^-1; 
     end
