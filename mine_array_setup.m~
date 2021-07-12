@@ -1,9 +1,5 @@
 function [pipe_nodes npipes node_pipes_out node_pipes_in Q] ...
           = mine_array_setup(np, nn, no, A10, A12, pipe_nodes, q, Q) 
-
-%%% Extra output information?
-verbose=0;
-      
 %%% Set up index arrays
 
 % Swap indices if flow is from end to start node:
@@ -18,11 +14,10 @@ for ipipe=1:np
 end
 
 if (verbose) 
-    disp('Flow direction of pipes:')
-    for ipipe=1:np
-        fprintf('  pipe %d has Q = %f from pipe %d to %d\n', ipipe, Q(ipipe), pipe_nodes(ipipe,1), pipe_nodes(ipipe,2))
+        disp(['Flow direction of pipes:')
+        for ipipe=1:np
+            displ(['  pipe: ' num2str(ipipe) 
     end
-end
 
 % Store nr of incoming and outgoing pipes for every node;
 npipes = zeros(2,no+nn); % nr of incoming (first row) and outgoing (2nd row) pipes

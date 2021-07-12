@@ -3,7 +3,7 @@ function [Tn Tp] = mine_heat(t, d, L, Q, v, np, nn, no, Tf_ini,...
     xtotal) 
 
 % More output needed? --> Set verbose to 1.
-verbose = 0;
+verbose = 1;
 
 r=d/2;
 
@@ -70,7 +70,8 @@ while (nnsolved<nn+no && nit<nitmax)  % Not all node T's have been solved: conti
                         k_r, Cp_r, rho_r, Tr, v(pipenr), t);
                     Tpsolved(pipenr) = 1;
                     if (verbose) 
-                        fprintf('Solved T for pipe %d: T= %f -> %f\n',pipenr,Tp(pipenr,1),Tp(pipenr,2))
+                        disp(['Solved T for pipe ' num2str(pipenr) ': T = ', num2str(Tp(pipenr,1)) char(9) '-> ' num2str(Tp(pipenr,2))])
+                        sprintf('Solved T for pipe %d: T= %f,w,o)
                     end
                     % node at end of this pipe:
                     end_node = pipe_nodes(pipenr,2); 
@@ -88,7 +89,7 @@ while (nnsolved<nn+no && nit<nitmax)  % Not all node T's have been solved: conti
         end   
     end
     if (verbose) 
-        fprintf('Number of node temperatures solved: %d/%d\n', nnsolved, nn+no)
+        disp(['Number of node temperatures solved:' num2str(nnsolved) '/' num2str(nn+no)])
     end
 end
 

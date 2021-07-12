@@ -23,7 +23,7 @@ clear
 verbose = 1;
 
 % Geometry used for calculation (not used if testbank!=0):
-igeom = 102;
+igeom = 103;
 alltests = igeom;
 
 % Testbank options to check if the code was broken during recent update: 
