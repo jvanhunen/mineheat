@@ -2,6 +2,11 @@ function [Tn Tp] = mine_heat(t, d, L, Q, v, np, nn, no, Tf_ini,...
     k_r, Cp_r, rho_r, Tr, npipes, node_pipes_in, node_pipes_out, pipe_nodes,...
     xtotal) 
 
+% version 20210712
+%    added verbose option for more debug information
+%    addressed weird (but harmless) pipe temperatures in case of zero or 
+%       extremely slow pipe flows (e.g. in dead-end roadways). 
+
 % More output needed? --> Set verbose to 1.
 verbose = 0;
 
