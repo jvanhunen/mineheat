@@ -11,6 +11,9 @@ clear
 % - benchark in Loredo et al, 2017
 % 
 % Version: 
+% 20210720 - started adding parameter sensitivity tests
+%            put mine plots in separate function mine_plots
+%            put testbank procedures in separate function testbank_eval
 % 20210630 - added testbank
 % 20210628 - added igeom 103 for grid with multiple extraction schemes
 % 20210609 - added igeom 101 and 102 to test prescribed in/outflow
@@ -20,14 +23,22 @@ clear
 % Jeroen van Hunen
 
 % More (debug?) output? --> Set verbose to 1.
-verbose = 1;
+verbose = 0;
+
+% Set (default) constant physical and model input parameters:
+Tf_ini = 3;        % water inflow temperature (degC) 
+nyrs   = 30;        % flow duration (yrs)
+k_r    = 3.0;      % thermal conductivity
+Cp_r   = 900.0;    % heat capacity
+rho_r  = 2300.0;   % density
+Tr     = 25.0;     % Initial rock temperature (degC)
 
 % Geometry used for calculation (not used if testbank!=0):
-igeom = 102;
+igeom = 103;
 alltests = igeom;
 
 % Testbank options to check if the code was broken during recent update: 
-testbank = 0; %  0 = no testing, use igeom above
+testbank = 1; %  0 = no testing, use igeom above
 %             % -1 = create testbank benchmark results 
 %             %  1 = testing your latest code against testbank results
 if testbank == 0
@@ -36,22 +47,39 @@ if testbank == 0
     disp (['mineheat: running + plotting geometry ',num2str(igeom),'.'])
 elseif testbank == -1 || testbank == 1
     ntests = 10;
-    alltests  = zeros(ntests,1);
-    alltests  = [1 2 3 4 5 6 7 101 102 103];
-    disp (['mineheat: Testbank: testing geometries ',num2str(alltests),'.'])
+    igeomarray  = [1 2 3 4 5 6 7 101 102 103];
+    disp (['mineheat: Testbank: testing geometries ',num2str(igeomarray),'.'])
 end
 
-for igeom = alltests
-    % read in geometries:
-    [nn, no, np, A12, A10, xo, x, d, Ho, q] = geometries(igeom);
+% parameter sensitivity tests
+% 1 = duration of extraction/reinjection
+paramsenstest = 0;
+if paramsenstest > 0  % set up serie of parameter sensitivity tests
+    switch paramsenstest
+        case paramsenstest == 1 % duration
+            nyrs_array = [0.125 0.25 0.5 1 2 4 8 16 32 64 128 256 512 1024 2048 4096 9192];
+            nyrs_array = 2.^[-10:30];
+            ntests = length(nyrs_array);
+            nyrs_result = zeros(1,ntests);
+    end
+end
 
-    % Set constant physical and model input parameters:
-    Tf_ini = 3;        % water inflow temperature (degC) 
-    nyrs   = 1;        % flow duration (yrs)
-    k_r    = 3.0;      % thermal conductivity
-    Cp_r   = 900.0;    % heat capacity
-    rho_r  = 2300.0;   % density
-    Tr     = 25.0;     % Initial rock temperature (degC)
+if testbank ~= 0 && paramsenstest ~=0
+    error('Error, cannot use testbank and paramsenstest simultaneously')
+end
+
+for irun = 1:ntests
+    
+    if testbank == -1 || testbank == 1
+        igeom = igeomarray(irun);
+    end
+    if paramsenstest > 0  % set up serie of parameter sensitivity tests
+        if paramsenstest == 1  % test different model times
+            nyrs = nyrs_array(irun); 
+        end
+    end
+    % read in geometries:
+    [nn, no, np, A12, A10, xo, x, d, Ho, q, idiagn] = geometries(igeom);
 
     % Array with start & end node of each pipe:
     pipe_nodes  = zeros(np,2);  % array to store start & end node of each pipe
@@ -97,36 +125,23 @@ for igeom = alltests
     %      outflow T
     
     % Store testbank results
-    if testbank == -1
-        savefile = ['testbank/testbank_' num2str(igeom) '.mat']
-        Hstore = H; 
-        Qstore = Q;
-        Tnstore = Tn;
-        Tpstore = Tp;
-        save(savefile,'Hstore', 'Qstore', 'Tnstore', 'Tpstore')
-    elseif testbank == 1
-        loadfile = ['testbank/testbank_' num2str(igeom) '.mat'];
-        if verbose
-            disp (['   --> Tested geometry ',num2str(igeom),':'])
-        end
-        load(loadfile,'Hstore', 'Qstore', 'Tnstore', 'Tpstore')
-        Hdiff = H - Hstore;
-        Qdiff = Q - Qstore;
-        Tndiff = Tn - Tnstore;
-        Tpdiff = Tp - Tpstore;
-        if (max(Hdiff) > 0 | max(Qdiff) > 0 | max(Tndiff) > 0 | max(Tpdiff) > 0)
-            disp (['       failed: Differences in H, Q, Tn, and Tp:'])
-            Hdiff
-            Qdiff
-            Tndiff
-            Tpdiff
-        else
-            disp ('       passed')
+    if testbank ~= 0
+        testbank_eval(testbank, H, Q, Tn, Tp, igeom)
+    end
+    if paramsenstest > 0  % set up serie of parameter sensitivity tests
+        if paramsenstest == 1  % test different model times
+            nyrs_result(irun) = Tp(idiagn);
         end
     end
 end
 
 % plot results: 
-if testbank == 0  % only plot results when not performing testbank tasks:
+if testbank == 0 && paramsenstest == 0 % only plot results when not performing testbank tasks:
     mine_plots (igeom, xo, x, d, np, nn, pipe_nodes, Tp, Tn, Q, H, Ho)
+end
+if(paramsenstest ~=0)
+    if paramsenstest == 1
+        figure(1), clf
+            semilogx(nyrs_array, nyrs_result, 'o-')
+    end
 end

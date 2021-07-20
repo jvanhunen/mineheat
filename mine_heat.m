@@ -2,6 +2,8 @@ function [Tn Tp] = mine_heat(t, d, L, Q, v, np, nn, no, Tf_ini,...
     k_r, Cp_r, rho_r, Tr, npipes, node_pipes_in, node_pipes_out, pipe_nodes,...
     xtotal) 
 
+% version 20210720 
+%    added warning for max nr iterations exceeded.
 % version 20210712
 %    added verbose option for more debug information
 %    addressed weird (but harmless) pipe temperatures in case of zero or 
@@ -58,9 +60,13 @@ for in=1:nn+no
     end
 end
 
-nitmax=100;
+nitmax=10000;
 nit=0;
-while (nnsolved<nn+no && nit<nitmax)  % Not all node T's have been solved: continue
+while (nnsolved<nn+no)  % Not all node T's have been solved: continue
+    if nit>=nitmax
+        disp('mine_heat: max nr iterations exceeded & not all nodes solved yet: increaste nitmax')
+        break;
+    end
     nit=nit+1;
     for in=1:nn+no      % loop over all nodes 
         if Tnsolved(in)>=npipes(1,in)   %
