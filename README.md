@@ -1,5 +1,9 @@
 # mineheat
 
+Update 20210723 JvH:
+- added new r0 calculation in pipeheat.m
+- this slightly changes all T calculations, so ran new set of benchmark testbanks results
+
 Update 20210720 JvH:
 - testbank added
 - first parameter sensistivity study option added

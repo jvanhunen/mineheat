@@ -114,7 +114,7 @@ elseif igeom==102
     n_out = nn-1;
     q(n_in) = -1.575e-4;  % prescribed external flow into first node 
     q(n_out) = 1.575e-4;  % prescribed external flow out of last node 
-    idiagn = n_out;
+    idiagn = nn+no;
 elseif igeom==103
     % large grid (diss Marijn Huis):
     n  = 10;   % grid width (number of nodes wide)

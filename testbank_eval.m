@@ -20,7 +20,7 @@ function testbank_eval(itestbank, H, Q, Tn, Tp, igeom)
         Qdiff = Q - Qstore;
         Tndiff = Tn - Tnstore;
         Tpdiff = Tp - Tpstore;
-        if (max(Hdiff) > 0 | max(Qdiff) > 0 | max(Tndiff) > 0 | max(Tpdiff) > 0)
+        if (max(abs(Hdiff)) > 0 | max(abs(Qdiff)) > 0 | max(abs(Tndiff)) > 0 | max(abs(Tpdiff)) > 0)
             disp ([' failed: Differences in H, Q, Tn, and Tp:'])
             disp (['          max diff in H:' num2str(max(abs(Hdiff))) ])
             disp (['          max diff in Q:' num2str(max(abs(Qdiff))) ])
