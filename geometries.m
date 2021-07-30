@@ -107,7 +107,8 @@ elseif igeom==102
     [nn, no, np, A12, A10, xo, x, d] = geometry102();
     % set fixed hydraulic heads:
     Ho     = zeros(no,1);
-    Ho(1)  = 5e-12; % only-fixed-head node is in middle.
+    %Ho(1)  = 5e-12; % only-fixed-head node is in middle.
+    Ho(1) = 0.;
     % set any external in/outflow for each (non-fixed) node:
     q    = zeros(nn,1);
     n_in = 2;

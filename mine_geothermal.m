@@ -34,11 +34,11 @@ rho_r  = 2300.0;   % density
 Tr     = 25.0;     % Initial rock temperature (degC)
 
 % Geometry used for calculation (not used if testbank!=0):
-igeom = 1;
+igeom = 102;
 alltests = igeom;
 
 % Testbank options to check if the code was broken during recent update: 
-testbank = 1; %  0 = no testing, use igeom above
+testbank = 0; %  0 = no testing, use igeom above
 %             % -1 = create testbank benchmark results 
 %             %  1 = testing your latest code against testbank results
 if testbank == 0

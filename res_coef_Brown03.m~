@@ -10,13 +10,12 @@ function r = res_coef_Brown03(Q,L,d)
    % Note that this calculation is based on values/formulae for pipes
    %   Not sure how valid this is for mine galleries
    % 
-   eps = 0.1; % Darcy-Weisbach roughness coeff (e.g. 0.001)
+   eps = 0.01; % Darcy-Weisbach roughness coeff (e.g. 0.001)
                % Values listed in EPANET manual Table 3.2, p.31 (in 1e-3 ft!)
                % On
                % https://en.wikipedia.org/wiki/Darcy%E2%80%93Weisbach_equation,
-               %    this roughness is compared to the diameter D, and has
-               %    the same units (i.e. metres). So perhaps eps=0.01 is
-               %    too small for the mine roadway walls?
+               %    thi
+               % 
    rho = 1000;  % density of water (kg/m3)
    mu  = 1e-3;  % dynamic viscosity of water (Pa s)
    % Reynolds number = rho*v*d/mu, with v=Q/(pi*r^2) = 4*Q/(pi*d^2)

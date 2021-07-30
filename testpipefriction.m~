@@ -1,0 +1,15 @@
+% testpipefriction
+
+d=2;
+eps=0.0001;
+i=1;
+Re1 = linspace(100,2000,20)
+Re
+for Re_i = Re
+   f(i) = pipe_friction_factor(Re_i, d, eps)
+   i=i+1
+end
+
+figure(100), clf
+plot(Re,f)
+axis([100 10000 0 0.12])
