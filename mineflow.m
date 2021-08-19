@@ -45,6 +45,15 @@ while (sumdQrel>1e-8)
     % Solving Eqn 19 of (Todini&Paliti, 1987):
     Qnew = (I-Ninv)*Q - Ninv*A11inv*(A12*Hnew + A10*Ho);
     
+    % Avoiding division by zero in iterative calculation of resistance
+    % coeff, make all Q non-zero:
+    for i = 1:size(Qnew,1)
+        if Qnew(i) == 0
+            Qnew(i) = min(Qnew(Qnew>0))/10;
+        end
+    end
+
+    
     % Calculate difference in Q between iterations:
     avQ = sum(abs(Qnew))/length(Qnew);
     dQrel = abs((Q-Qnew)./avQ);

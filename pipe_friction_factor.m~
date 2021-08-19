@@ -1,11 +1,9 @@
 function f = pipe_friction_factor(Re, d, eps)
     % Version 20210729 JvH
-    %    Note that there is some confusion about the log (i.e. natural log, or ln) 
-    %    versus log10 (i.e. 10-base log) terms.
-    %    it seems that for Re>4000, log10 should be used
-    %    for 2000<Re<4000, it is less clear: check out
-    %    also, previous version calculated Y2 = log(logfactor) rather than
-    %       Y2=logfactor.
+    %    minor correction: Y2 = logfactor rather than Y2=log(logfactor)
+    %        makes negligible difference
+    %    Note that the use of log10 for Re>4000, while using log for
+    %        2000<Re<4000 is correct 
     % Jeroen van Hunen, 20190505
     % This function calculates the friction factor for flow in a pipe.
     % From EPANET 2 manual (2000), App.D, p.189.
@@ -24,15 +22,13 @@ function f = pipe_friction_factor(Re, d, eps)
     elseif Re>4000
         % turbulent regime, Swamee–Jain equation (from Bhave, 1991):
         % Note that, unlike stated in EPANET manual, the log used in (only)
-        %   this formula should be a log10, not an ln, hence the log(10)^2 
-        %   to compensate for that. 
+        %   this formula should be a log10. 
         lf = logfactor(Re, d, eps);
-        f = log(10)^2*0.25 / log(lf)^2; 
-        %f = 0.25 / log(lf)^2; 
+        f = 0.25 / log10(lf)^2; 
     else
-        % intermediate regime (Dunlop. 1991):
+        % intermediate regime (Dunlop. 1991). N:
         R  = Re/2000;
-        Y2 = logfactor(Re, d, eps));
+        Y2 = logfactor(Re, d, eps);
         Y3 = -0.86859*log(logfactor(4000, d, eps));
         FA = Y3^-2;
         FB = FA * (2-0.00514215/Y2/Y3);

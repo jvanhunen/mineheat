@@ -22,13 +22,11 @@ function f = pipe_friction_factor(Re, d, eps)
     elseif Re>4000
         % turbulent regime, Swamee–Jain equation (from Bhave, 1991):
         % Note that, unlike stated in EPANET manual, the log used in (only)
-        %   this formula should be a log10, not an ln, hence the log(10)^2 
-        %   to compensate for that. 
+        %   this formula should be a log10. 
         lf = logfactor(Re, d, eps);
         f = 0.25 / log10(lf)^2; 
-        %f = 0.25 / log(lf)^2; 
     else
-        % intermediate regime (Dunlop. 1991):
+        % intermediate regime (Dunlop. 1991). Note that here, ln should be used, not log10:
         R  = Re/2000;
         Y2 = logfactor(Re, d, eps);
         Y3 = -0.86859*log(logfactor(4000, d, eps));
