@@ -1,4 +1,4 @@
-function Tout = mine_plots (igeom, xo, x, d, np, nn, pipe_nodes, Tp, Tn, Q, H, Ho)
+function Tout = mine_plots (igeom, xo, x, d, np, nn, pipe_nodes, Tp, Tn, Q, H, Ho, Tr)
 % 
 % This routine plots temperature T, flow Q and fluid pressure (hydraulic
 % head ) H distributions across the mine network.
@@ -17,6 +17,7 @@ figure(1), clf
         hold on 
         colormap(jet)
         caxis([min(min(Tp)) max(max(Tp))]);
+%         caxis([min(min(Tp)) Tr]);
         for ip = 1:np
             x1 = xtotal(pipe_nodes(ip,1),1);
             x2 = xtotal(pipe_nodes(ip,2),1);
@@ -37,10 +38,11 @@ figure(1), clf
             if (nn<20) 
                 plot(xtotal(:,1), xtotal(:,2),'ko','MarkerSize',10,'MarkerFaceColor', 'k')
             end
-            hcb = colorbar;
-            title(hcb,'T(^oC)')
-            %view(2)
         end
+        hcb = colorbar;
+        title(hcb,'T(^oC)')
+        %view(2)
+        
 figure(2), clf
     axis equal
     hold on 
@@ -73,11 +75,11 @@ figure(2), clf
         if (nn<20) 
             plot(xtotal(:,1), xtotal(:,2),'ko','MarkerSize',10,'MarkerFaceColor', 'k')
         end
-        hcb = colorbar;
-        title(hcb,'Q(m^3/sec)')
-        view(2)
     end
-
+    hcb = colorbar;
+    title(hcb,'Q(m^3/sec)')
+    view(2)
+    
 figure(3), clf
     axis equal
     grid on
@@ -106,11 +108,11 @@ figure(3), clf
         if (nn<20) 
             plot(xtotal(:,1), xtotal(:,2),'ko','MarkerSize',10,'MarkerFaceColor', 'k')
         end
-        hcb = colorbar;
-        title(hcb,'H(m)')
-        view(2)
     end
-
+    hcb = colorbar;
+    title(hcb,'H(m)')
+    view(2)
+    
 if igeom ==1 || igeom==101 || igeom==102
     figure(4), clf
         x = xtotal(:,1);    % x-coordinates
@@ -124,5 +126,5 @@ end
 
 drawnow
 
-disp (['Max node temperature = ', num2str(max(abs(Tn))), ' degC'])
-disp (['Max flow rate = ', num2str(1e3*max(abs(Q))), ' litres/sec'])
+disp (['Max node temperature = ', num2str(max(abs(Tn))), ' degC']) % not correct, error in model
+disp (['Max flow rate = ', num2str(1e3*max(abs(Q))), ' litres/sec']) 

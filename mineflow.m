@@ -27,7 +27,10 @@ A21  = A12';
 
 % Start iterative calculation using Newton method: 
 sumdQrel=1e10;
-while (sumdQrel>1e-8)
+counter = 1;
+sumdQrel_arr = zeros(1,1);
+while (sumdQrel>1e-8) %original option was 1e-8
+%     disp(['Iteration no.',num2str(counter),', sumdQrel = ',num2str(sumdQrel)]) 
     for ip=1:np
         % calc resistance coeff using Darcy-Weisbach formula
         %    (EPANET manual p.30 & Table 3.1)
@@ -36,23 +39,21 @@ while (sumdQrel>1e-8)
         % Inverse of A11 as in Eqn 7 of (Todini&Paliti, 1987) 
         A11inv(ip,ip) = (r(ip)*(abs(Q(ip)))^(B-1))^-1; 
     end
-
     % Solving Eqn 18 of (Todini&Paliti, 1987):
     A = -(A21*Ninv*A11inv*A12);
     F = A21*Ninv*(Q + A11inv*A10*Ho) + q - A21*Q;
     Hnew = A\F;
-
+    
     % Solving Eqn 19 of (Todini&Paliti, 1987):
     Qnew = (I-Ninv)*Q - Ninv*A11inv*(A12*Hnew + A10*Ho);
     
-    % Avoiding division by zero in iterative calculation of resistance
-    % coeff, make all Q non-zero:
-    for i = 1:size(Qnew,1)
+    % Replace zero flow values with very small nonzero values
+    % If Q contains 0 flows this results in divide-by-0 errors
+    for i = 1:length(Qnew)
         if Qnew(i) == 0
             Qnew(i) = min(Qnew(Qnew>0))/10;
         end
     end
-
     
     % Calculate difference in Q between iterations:
     avQ = sum(abs(Qnew))/length(Qnew);
@@ -60,6 +61,26 @@ while (sumdQrel>1e-8)
     sumdQrel = sum(dQrel);
     
     % prepare for next iteration:
-    H=Hnew;
-    Q=Qnew;
+    a = 0.5; % a+b must equal 1
+    b = 0.5; % a+b must equal 1
+    Q = a*Q+b*Qnew; % damping oscillation - Q reset
+    
+    counter = counter + 1;
+    sumdQrel_arr(counter,1) = sumdQrel;
+    
+    % check solution - if stuck in infginite loop the model quits
+    num_doubles = 0; % count the number of double numbers in sumdQrel_arr
+    for icounter = 1:counter-1
+        if round(sumdQrel_arr(counter),5,'significant') == round(sumdQrel_arr(icounter),5,'significant')
+            num_doubles = num_doubles + 1;
+            if num_doubles > 10 % value to ensure double numbers are not due to chance
+                error('Error in flow calculation. Stuck in infinite loop. Consider changing a and b in Q reset in mineflow.m. Decrease a and increase b.');
+            end
+        end
+    end
+    
+%     if counter > 2500 % || sumdQrel_new >= sumdQrel % prepare for next itrtn
+%         save('sumdQrel_arr2','sumdQrel_arr')
+%         error('Error in flow calculation. Stuck in infinite loop.');
+%     end
 end

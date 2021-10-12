@@ -1,4 +1,4 @@
-function [nn, no, np, A12, A10, xo, x, d] = hawthorn_model(d_in,igeom,option)
+function [nn, no, np, A12, A10, xo, x] = hawthorn_model(igeom,option)
 
 clear geom
 
@@ -42,7 +42,7 @@ A10 = geom(:,5:6);
 
 A12 = geom(:,7:end); %*-1?
 
-% pipe diameters: 
-d   = d_in*ones(np,1);
-% Likely 2.3 +/- 0.4 m
-% See notes 22nd Jan for justification
+% % pipe diameters: set in mine_geothermal
+% d   = d_in*ones(np,1);
+% % Likely 2.3 +/- 0.4 m
+% % See notes 22nd Jan for justification

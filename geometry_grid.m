@@ -1,4 +1,4 @@
-function [nn, no, np, A12, A10, xo, x, d] = geometry_grid(n,m,l1,l2,id)
+function [nn, no, np, A12, A10, xo, x] = geometry_grid(n,m,l1,l2,id)
 
 % with: 
 %   - = pip
@@ -180,5 +180,5 @@ nn  = nn-size(xo,1);      % nr of unknown head nodes
 no  = no+size(xo,1);      % nr of fixed head nodes
 np  = np;                 % nr of pipes
 
-% pipe diameters:
-d   = 4*ones(np,1);
+% % pipe diameters: set in mine_geothermal
+% d   = 4*ones(np,1);

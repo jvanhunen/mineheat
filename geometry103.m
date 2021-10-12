@@ -1,4 +1,4 @@
-function [nn, no, np, A12, A10, xo, x, d] = geometry103(n,m,l1,l2,id)
+function [nn, no, np, A12, A10, xo, x] = geometry103(n,m,l1,l2,id)
 
 % with: 
 %   - = pip
@@ -77,5 +77,5 @@ x(n*m,:)  = [];
 % A10
 % size(A12)
 
-% pipe diameters:
-d   = 2*ones(np,1);
+% % pipe diameters:
+% d   = 2*ones(np,1);

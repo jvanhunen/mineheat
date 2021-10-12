@@ -1,4 +1,4 @@
-function [nn, no, np, A12, A10, xo, x, d] = ArcGeometry
+function [nn, no, np, A12, A10, xo, x] = ArcGeometry
 
 S = shaperead('G17P_SpatialJoin12.shp');
 sizeofS = size(S);
@@ -56,8 +56,8 @@ end
 
 Atemp;
 Atemp2 = abs(Atemp);
-sum1=sum(Atemp2,1)
-sum2=sum(Atemp2,2)
+sum1=sum(Atemp2,1);
+sum2=sum(Atemp2,2);
 no=1;
 nn = ntemp-1;
 A10 = Atemp(:,1);
@@ -65,5 +65,5 @@ A12 = Atemp(:,2:end);
 xo = xtemp(1,:);
 x = xtemp(2:end,:);
 
-% pipe diameters: 
-d   = 4*ones(np,1);
+% % pipe diameters: set in mine_geothermal
+% d   = 4*ones(np,1);

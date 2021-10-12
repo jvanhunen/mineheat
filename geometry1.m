@@ -1,4 +1,4 @@
-function [nn, no, np, A12, A10, xo, x, d] = geometry1;
+function [nn, no, np, A12, A10, xo, x] = geometry1;
 
 % Linear pipe system:
 %      * - o - o - o - ... - o - * 
@@ -42,6 +42,6 @@ A10(np,2) = 1;
 xtotal = [xo(1,:); x; xo(2,:)];
 L      = diff(xtotal, 1,1);
 
-% pipe diameters: 
-d   = 2*ones(np,1);
-%d(2,1) = 0.05;
+% % pipe diameters: set in mine_geothermal
+% d   = 2*ones(np,1);
+% %d(2,1) = 0.05;

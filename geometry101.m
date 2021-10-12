@@ -1,4 +1,4 @@
-function [nn, no, np, A12, A10, xo, x, d] = geometry101;
+function [nn, no, np, A12, A10, xo, x] = geometry101;
 
 % 20210609 Modification from geometry1: 
 %          only one fixed head node (at outflow)
@@ -49,6 +49,6 @@ A10(np,1) = 1;
 %xtotal = [x; xo(1,:)];
 %L      = diff(xtotal, 1,1);
 
-% pipe diameters: 
-d   = 2*ones(np,1);
-%d(2,1) = 0.05;
+% % pipe diameters: set in mine_geothermal
+% d   = 2*ones(np,1);
+% %d(2,1) = 0.05;

@@ -1,4 +1,4 @@
-function [nn, no, np, A12, A10, xo, x, d] = geometry3
+function [nn, no, np, A12, A10, xo, x] = geometry3
 
 % in =         2   3   4      
 %              o - o - o 
@@ -52,6 +52,6 @@ A12( 8, 6) = -1; A12( 8, 7) = 1;
 A12( 9, 7) = -1; A12( 9, 8) = 1;
 A12(10, 8) = -1; A12(10, 5) = 1;
 
-% pipe diameters: 
-d   = 4*ones(np,1);
-d(2,1) = 2;
+% % pipe diameters: set in mine_geothermal
+% d   = 4*ones(np,1);
+% d(2,1) = 2;
