@@ -19,12 +19,12 @@ np  = (n-1)*m + (m-1)*n;     % nr of pipes
 % Parameters to be solved in this function:
 A12 = sparse(np,nn);
 A10 = sparse(np,no);
-xo  = zeros(no,2);
-x   = zeros(nn,2);
+xo  = zeros(no,3);
+x   = zeros(nn,3);
 
 % locations of boundary unknown-nodes:
 for in = 1:n*m
-    x(in,:) = [((in-1)-floor((in-1)/n)*n)*l1 floor((in-1)/n)*l2];
+    x(in,:) = [((in-1)-floor((in-1)/n)*n)*l1 floor((in-1)/n)*l2 0];
     if in==1 % corner1 - check
         A12(1,in) = -1;
         A12((n-1)*m+1,in) = -1;
@@ -66,7 +66,7 @@ A10((n-1)*m,1) = 1;
 A10((n-1)*m+(m-1)*n,1) = 1;
 
 % locations of known-nodes: 
-xo(1,:) = [(n-1)*l1 (m-1)*l2];
+xo(1,:) = [(n-1)*l1 (m-1)*l2 0];
 no=1;
 nn=nn-1;
 A12(:,n*m)= [];

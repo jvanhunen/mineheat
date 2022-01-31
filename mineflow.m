@@ -22,15 +22,18 @@ r    = zeros(np,1);
 %                          (Todini&Paliti, 1987))
 B    = 2;  % Not sure if eqns below are valid if B is not 2!
 I    = eye(np);
-Ninv = 1./B*I;
+%Ninv = 1./B*I;
 A21  = A12';
+A11inv = sparse(np,np);
+A11invvec = zeros(np,1);
 
 % Start iterative calculation using Newton method: 
 sumdQrel=1e10;
+maxdQrel=1e10;
 counter = 1;
 sumdQrel_arr = zeros(1,1);
-while (sumdQrel>1e-8) %original option was 1e-8
-%     disp(['Iteration no.',num2str(counter),', sumdQrel = ',num2str(sumdQrel)]) 
+while (sumdQrel>1e-8 && maxdQrel>1e-10) %original option was 1e-8
+    %disp(['Iteration no.',num2str(counter),', sumdQrel = ',num2str(sumdQrel), ', maxdQrel = ',num2str(maxdQrel)]) 
     for ip=1:np
         % calc resistance coeff using Darcy-Weisbach formula
         %    (EPANET manual p.30 & Table 3.1)
@@ -39,13 +42,26 @@ while (sumdQrel>1e-8) %original option was 1e-8
         % Inverse of A11 as in Eqn 7 of (Todini&Paliti, 1987) 
         A11inv(ip,ip) = (r(ip)*(abs(Q(ip)))^(B-1))^-1; 
     end
+    %dA11inv = diag(A11inv);
     % Solving Eqn 18 of (Todini&Paliti, 1987):
-    A = -(A21*Ninv*A11inv*A12);
-    F = A21*Ninv*(Q + A11inv*A10*Ho) + q - A21*Q;
-    Hnew = A\F;
     
+    %A = -(A21*Ninv*A11inv*A12);
+    %tic; disp('   *1')
+    A = -(A21*A11inv*A12)/B;
+    %toc
+    %tic; disp('   *2')
+    %F = A21*Ninv*(Q + A11inv*A10*Ho) + q - A21*Q;
+    F = A21/B*(Q + A11inv*A10*Ho) + q - A21*Q;
+    %toc
+    %tic; disp('   *3')
+    Hnew = A\F;
+    %toc
+    %tic; disp('   *4')
     % Solving Eqn 19 of (Todini&Paliti, 1987):
-    Qnew = (I-Ninv)*Q - Ninv*A11inv*(A12*Hnew + A10*Ho);
+    %Qnew = (I-Ninv)*Q - Ninv*A11inv*(A12*Hnew + A10*Ho);
+    Qnew = (1-1/B)*Q - A11inv*(A12*Hnew + A10*Ho)/B;
+    %toc
+   
     
     % Replace zero flow values with very small nonzero values
     % If Q contains 0 flows this results in divide-by-0 errors
@@ -59,6 +75,7 @@ while (sumdQrel>1e-8) %original option was 1e-8
     avQ = sum(abs(Qnew))/length(Qnew);
     dQrel = abs((Q-Qnew)./avQ);
     sumdQrel = sum(dQrel);
+    maxdQrel = max(dQrel);
     
     % prepare for next iteration:
     a = 0.5; % a+b must equal 1
@@ -84,3 +101,4 @@ while (sumdQrel>1e-8) %original option was 1e-8
 %         error('Error in flow calculation. Stuck in infinite loop.');
 %     end
 end
+H=Hnew;

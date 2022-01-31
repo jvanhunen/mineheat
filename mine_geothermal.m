@@ -10,18 +10,7 @@ clear
 % - Rodriguez & Diaz, 2009
 % - benchark in Loredo et al, 2017
 % 
-% Version: 
-% 20210720 - started adding parameter sensitivity tests
-%            put mine plots in separate function mine_plots
-%            put testbank procedures in separate function testbank_eval
-% 20210630 - added testbank
-% 20210628 - added igeom 103 for grid with multiple extraction schemes
-% 20210609 - added igeom 101 and 102 to test prescribed in/outflow
-% 20210518 - merging different codes into a signle master version   
-% 20190628 - code split up in separate subfunctions
-% 
 % Jeroen van Hunen
-
 
 % More (debug?) output? --> Set verbose to 1.
 verbose = 0;
@@ -43,7 +32,7 @@ alltests = igeom;
 qset   = 67/3600;  
 
 % Set inflow/outflow node locations:
-n_flows = 3; % specify number of flows on mine system
+n_flows = 1; % specify number of flows on mine system
 % 2 flow system possible
 q_in  = cell(n_flows,1);
 q_out = cell(n_flows,1);
@@ -52,6 +41,7 @@ q_out = cell(n_flows,1);
 % - current limit is 4 flows
 switch n_flows
     case 1
+        q_in{1}=1098; q_out{1}=2512;
         q_in{1}  = 1;
         q_out{1} = 10;
     case 2
@@ -78,7 +68,7 @@ switch n_flows
 end
 
 % Testbank options to check if the code was broken during recent update: 
-testbank = 1; %  0 = no testing, use igeom above
+testbank = 0 ; %  0 = no testing, use igeom above
               % -1 = create testbank benchmark results 
               %  1 = testing your latest code against testbank results
 if testbank == 0
@@ -86,8 +76,8 @@ if testbank == 0
     alltests = igeom;
     disp (['mineheat: running + plotting geometry ',num2str(igeom),'.'])
 elseif testbank == -1 || testbank == 1
-    ntests = 10;
-    igeomarray  = [1 2 3 4 5 6 7 101 102 103];
+    ntests = 8 ;
+    igeomarray  = [1 2 3 4 5 101 102 103];
     disp (['mineheat: Testbank: testing geometries ',num2str(igeomarray),'.'])
     % set a default set of physical parameters: 
     Tf_ini = 3;        % water inflow temperature (degC) 
@@ -136,7 +126,10 @@ for irun = 1:ntests
         end
     end
     % read in geometries:
+    %tic
     [nn, no, np, A12, A10, xo, x, Ho, q, idiagn] = geometries(igeom,qset,q_in,q_out);
+    %sprintf('mine array setup')
+    %toc
     
     % Array with diameter for each pipe
     d = d_set*ones(np,1);
@@ -159,19 +152,23 @@ for irun = 1:ntests
     x1 = xtotal(p1,:);
     x2 = xtotal(p2,:);
     dx = x2-x1;
-    L  = sqrt(dx(:,1).^2+dx(:,2).^2);
+    L  = sqrt(dx(:,1).^2+dx(:,2).^2);  % z-distance not in here yet
     
     % Initial rock temperature (in degC):   
     Tin    = Tf_ini*ones(np,1);
     
 %     disp('mineflow') % update where code is running on terminal
-%     tic
     % Calculate flow through pipe system:
+    %tic
     [H Q]  = mineflow(nn, no, np, x, xo, A12, A10, Ho, q, L, d);
-%     toc
+    %sprintf('mine flow')
+    %toc
     %%% Setup pipe flow arrays:
+    %tic
     [pipe_nodes npipes node_pipes_out node_pipes_in Q] ...
            = mine_array_setup(np, nn, no, A10, A12, pipe_nodes, q, Q);
+    %sprintf('mine array setup')
+    %toc
 
     %%% Calculate temperature of pipe system:
     % set time at 'nyear' years:
@@ -179,10 +176,11 @@ for irun = 1:ntests
     v      = Q ./ (pi*(d/2).^2);
     
 %     disp('mine_heat') % update where code is running on terminal
-%     tic
+    %tic
     [Tn Tp]= mine_heat(t, d, L, Q, v, np, nn, no, Tf_ini, k_r, Cp_r, rho_r,...
         Tr, npipes, node_pipes_in, node_pipes_out, pipe_nodes,xtotal);
-%     toc
+    %sprintf('mine_heat')
+    %toc
     % Output of routine mine_heat: 
     % - Tn, ordered as [x0;x] (i.e. first all fixed-head nodes, then the others
     % - Tp, as np-by-2 array, with Tp(:,1)=inflow T of pipe, and Tp(:,2) the
@@ -197,14 +195,16 @@ for irun = 1:ntests
             nyrs_result(irun) = Tn(idiagn);
         end
     end
+    %pause
 end
 
 % plot results: 
 if testbank == 0 && paramsenstest == 0 % only plot results when not performing testbank tasks:
     disp('Plotting... Please wait');
-%     tic
-    mine_plots (igeom, xo, x, d, np, nn, pipe_nodes, Tp, Tn, Q, H, Ho, Tr)
-%     toc
+    %tic
+    mine_plots (igeom, xo, x, d, np, nn, pipe_nodes, Tp, Tn, Q, H, Ho, Tr, Tf_ini)
+    %sprintf('mine_plots')
+    %toc
 end
 if(paramsenstest ~=0)
     if paramsenstest == 1

@@ -23,21 +23,21 @@ np  = 13;      % nr of pipes
 A12 = zeros(np,nn);
 A10 = zeros(np,no);
 A11inv = sparse(np,np);
-xo  = zeros(no,2);
-x   = zeros(nn,2);
+xo  = zeros(no,3);
+x   = zeros(nn,3);
 
 % locations of nodes: 
-xo(1,:) = [  0 200];
-xo(2,:) = [600   0];
+xo(1,:) = [  0 200 0];
+xo(2,:) = [600   0 0];
 
-x(1,:) = [100 200];
-x(2,:) = [200   0];
-x(3,:) = [300   0];
-x(4,:) = [400   0];
-x(5,:) = [500   0];
-x(6,:) = [200 200];
-x(7,:) = [300 200];
-x(8,:) = [400 200];
+x(1,:) = [100 200 0];
+x(2,:) = [200   0 0];
+x(3,:) = [300   0 0];
+x(4,:) = [400   0 0];
+x(5,:) = [500   0 0];
+x(6,:) = [200 200 0];
+x(7,:) = [300 200 0];
+x(8,:) = [400 200 0];
 
 % In linear pipe configuration, for each node in, pipe in feeds into 
 % node in, and pipe in+1 leaves node in:

@@ -1,8 +1,9 @@
 function [nn, no, np, A12, A10, xo, x] = ArcGeometry
 
-S = shaperead('G17P_SpatialJoin12.shp');
-sizeofS = size(S);
-npoints = sizeofS(1);
+S = shaperead('maps/G17P_SpatialJoin12.shp');
+%S = shaperead('maps/Upperrasternew.shp');
+sizeofS = size(S)
+npoints = sizeofS(1)
 flow_dir = zeros(npoints,1);
 for ipoint = 1:npoints
     if (S(ipoint).POINT_X == S(ipoint).EXT_MIN_X && S(ipoint).POINT_Y == S(ipoint).EXT_MIN_Y)
@@ -35,14 +36,14 @@ no  = 1;       % nr of fixed head nodes
 % Parameters to be solved in this function:
 
 Atemp = zeros(np,ntemp);
-A11inv = zeros(np,np);
-xtemp   = zeros(ntemp,2);
+%A11inv = zeros(np,np);
+xtemp   = zeros(ntemp,3);
 
 % locations of nodes
 
 for ipoint = 1:npoints
     nodeid = S(ipoint).NODEID;
-    xtemp(nodeid,:) = [S(ipoint).POINT_X,S(ipoint).POINT_Y];
+    xtemp(nodeid,:) = [S(ipoint).POINT_X,S(ipoint).POINT_Y, 0];
 end
 
 % In linear pipe configuration, for each node in, pipe in feeds into 
@@ -52,18 +53,21 @@ for ipoint = 1:npoints
     nodeid = S(ipoint).NODEID;
     pipeid = S(ipoint).PIPEID;
     Atemp(pipeid,nodeid) = flow_dir(ipoint);
+    %sprintf('pipe %d, node %d, flowdir %d',pipeid,nodeid,flow_dir(ipoint))
+
 end
 
-Atemp;
+check0=sum(Atemp,2)
+check1=find(sum(Atemp,2)~=0)
 Atemp2 = abs(Atemp);
 sum1=sum(Atemp2,1);
-sum2=sum(Atemp2,2);
+check2=find(sum(Atemp2,2)~=2)
 no=1;
 nn = ntemp-1;
-A10 = Atemp(:,1);
-A12 = Atemp(:,2:end);
+A10 = sparse(Atemp(:,1));
+A12 = sparse(Atemp(:,2:end));
 xo = xtemp(1,:);
 x = xtemp(2:end,:);
 
 % % pipe diameters: set in mine_geothermal
-% d   = 4*ones(np,1);
+% d   = 4*ones(np,1); 

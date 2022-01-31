@@ -45,6 +45,8 @@ for inode = 1:nn+no
         Tn(inode)=Tf_ini*external_inflow/(sumQin+external_inflow);  % Give all these nodes initial inflow T at first
     elseif (sumQin/Qmax<1e-6 && sumQout/Qmax<1e-6) % no significant in or outflow: stagnant point, set T=Tr
         Tn(inode) = Tr;
+%         Tnsolved(inode)=1;   % Mark these nodes as 'temperature solved' 
+%         nnsolved = nnsolved+1;
     end
     % If more than 1 pipe flows into node, then T of node will be a weighted
     % average of the T of those inflowing pipes.
@@ -60,16 +62,18 @@ for in=1:nn+no
     end
 end
 
-nitmax=10000;
+nitmax=nn+no;
 nit=0;
 while (nnsolved<nn+no)  % Not all node T's have been solved: continue
     if nit>=nitmax
-        disp('mine_heat: max nr iterations exceeded & not all nodes solved yet: increaste nitmax')
+        disp('mine_heat: max nr iterations exceeded & not all nodes solved yet: increase nitmax')
         break;
     end
     nit=nit+1;
     for in=1:nn+no      % loop over all nodes 
-        if Tnsolved(in)>=npipes(1,in)   %
+        if Tnsolved(in)>=npipes(1,in)   % The >= will take care of nodes without 
+                                        % inflow pipes (Tnsolved set to 1 in previous 
+                                        % routine, but npipes(1,...) =0)
             % T in this node known: start process of projecting T downstream:
             for ip = 1: npipes(2,in) % loop over pipes flowing out of this node
                 % pipe number for this pipe: 
@@ -106,43 +110,45 @@ end
 if (nnsolved<nn+no)
     disp('Number of node temperatures to be solved in total:')
     disp(nn+no)
-    figure(5), clf
-        axis equal
-        xlabel('National Grid Easting')
-        %xlim([419040 419280])
-        ylabel('National Grid Northing')
-        %ylim([552620 552940])
-        %xtotal = [xo; x];
-        dmax = max(d);
-        dplot = 2;
-            grid on
-            hold on 
-            colormap(jet)
-            caxis([min(min(Tpsolved)) max(max(Tpsolved))]);
-            for ip = 1:np
-                x1 = xtotal(pipe_nodes(ip,1),1);
-                x2 = xtotal(pipe_nodes(ip,2),1);
-                y1 = xtotal(pipe_nodes(ip,1),2);
-                y2 = xtotal(pipe_nodes(ip,2),2);
-                T1 = Tpsolved(ip);
-                T2 = Tpsolved(ip);
-                z1 = 0;
-                z2 = 0;
-                x = [x1 x2];
-                y = [y1 y2];
-                z = [z1 z2];
-                col = [T1 T2];
-                surface([x;x],[y;y],[z;z],[col;col],... 
-                        'facecol','no',... 
-                        'edgecol','interp',...
-                        'linew',d(ip)/dmax*dplot);
-                if (nn<20) 
-                    plot(xtotal(:,1), xtotal(:,2),'ko','MarkerSize',10,'MarkerFaceColor', 'k')
-                end
-                hcb = colorbar;
-                title(hcb,'Tpsolved(0|1)')
-                %view(2)
-            end    
+    disp('Number of node temperatures solved sofar:')
+    disp(nnsolved)
+%     figure(5), clf
+%         axis equal
+%         xlabel('National Grid Easting')
+%         %xlim([419040 419280])
+%         ylabel('National Grid Northing')
+%         %ylim([552620 552940])
+%         %xtotal = [xo; x];
+%         dmax = max(d);
+%         dplot = 2;
+%             grid on
+%             hold on 
+%             colormap(jet)
+%             caxis([min(min(Tpsolved)) max(max(Tpsolved))]);
+%             for ip = 1:np
+%                 x1 = xtotal(pipe_nodes(ip,1),1);
+%                 x2 = xtotal(pipe_nodes(ip,2),1);
+%                 y1 = xtotal(pipe_nodes(ip,1),2);
+%                 y2 = xtotal(pipe_nodes(ip,2),2);
+%                 T1 = Tpsolved(ip);
+%                 T2 = Tpsolved(ip);
+%                 z1 = 0;
+%                 z2 = 0;
+%                 x = [x1 x2];
+%                 y = [y1 y2];
+%                 z = [z1 z2];
+%                 col = [T1 T2];
+%                 surface([x;x],[y;y],[z;z],[col;col],... 
+%                         'facecol','no',... 
+%                         'edgecol','interp',...
+%                         'linew',d(ip)/dmax*dplot);
+%                 if (nn<20) 
+%                     plot(xtotal(:,1), xtotal(:,2),'ko','MarkerSize',10,'MarkerFaceColor', 'k')
+%                 end
+%                 hcb = colorbar;
+%                 title(hcb,'Tpsolved(0|1)')
+%                 %view(2)
+%             end    
 end
 
 

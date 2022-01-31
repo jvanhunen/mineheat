@@ -97,6 +97,61 @@ elseif igeom==8
         q(q_out{i}) = qset;
     end
     idiagn = nn;
+elseif igeom==9
+    %ArcGIS Shapefile Geometry
+    [nn, no, np, A12, A10, xo, x] = ArcGeometryZ();
+    % Check if in/outflow locations fit in nodal space
+    if max([q_in{:}]) > nn || max([q_out{:}]) > nn
+        error('q_in and/or q_out locations are greater than nodal space of mine model. Choose different q_in and/or q_out.');
+    end
+    % set fixed hydraulic heads:
+    Ho     = zeros(no,1);
+    Ho(1)  = 0;
+    % set any external in/outflow for each (non-fixed) node:
+    q    = zeros(nn,1);
+    for i = 1:length(q_in)
+        q(q_in{i})  = -qset;
+        q(q_out{i}) = qset;
+    end
+    idiagn = nn;
+elseif igeom==10
+    %ArcGIS Shapefile Geometry
+    nconnect1=9;
+    nconnect2=9;
+    [nn, no, np, A12, A10, xo, x] = ArcGeometrySecondSeam(nconnect1,nconnect2);
+    % Check if in/outflow locations fit in nodal space
+    if max([q_in{:}]) > nn || max([q_out{:}]) > nn
+        error('q_in and/or q_out locations are greater than nodal space of mine model. Choose different q_in and/or q_out.');
+    end
+    % set fixed hydraulic heads:
+    Ho     = zeros(no,1);
+    Ho(1)  = 0;
+    % set any external in/outflow for each (non-fixed) node:
+    q    = zeros(nn,1);
+    for i = 1:length(q_in)
+        q(q_in{i})  = -qset;
+        q(q_out{i}) = qset;
+    end
+    idiagn = nn;
+elseif igeom==11
+    %ArcGIS Shapefile Geometry
+    nconnect1=1240;
+    nconnect2=2260;
+    [nn, no, np, A12, A10, xo, x] = ArcGeometrySecondSeamZ(nconnect1,nconnect2);
+    % Check if in/outflow locations fit in nodal space
+    if max([q_in{:}]) > nn || max([q_out{:}]) > nn
+        error('q_in and/or q_out locations are greater than nodal space of mine model. Choose different q_in and/or q_out.');
+    end
+    % set fixed hydraulic heads:
+    Ho     = zeros(no,1);
+    Ho(1)  = 0;
+    % set any external in/outflow for each (non-fixed) node:
+    q    = zeros(nn,1);
+    for i = 1:length(q_in)
+        q(q_in{i})  = -qset;
+        q(q_out{i}) = qset;
+    end
+    idiagn = nn;
 elseif igeom==101
     % linear pipesystem with one fixed head, and one prescribed inflow point:
     [nn, no, np, A12, A10, xo, x] = geometry101();
@@ -152,5 +207,5 @@ elseif igeom==103
         q(q_in{i})  = -qset;
         q(q_out{i}) = qset;
     end
-    idiagn = 148;  % not very useful, since there are 2 outlets, not 1.
+    idiagn = 148;  % not very useful, since there are 2 outlets, not 1
 end
