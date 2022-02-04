@@ -1,46 +1,123 @@
-function Tout = mine_plots (igeom, xo, x, d, np, nn, pipe_nodes, Tp, Tn, Q, H, Ho, Tr, Tf)
+function Tout = mine_plots (igeom, xo, x, d, np, nn, pipe_nodes, Tp, Tn, Q, H, Ho, Tr, Tf, q, colourBar)
 % 
 % This routine plots temperature T, flow Q and fluid pressure (hydraulic
 % head ) H distributions across the mine network.
 %
 % Version 20210630 Jeroen van Hunen
 
+%%% Retrieve inflow and outflow nodes
+qin_node = find(q<0);
+qout_node = find(q>0);
+
 dplot = 2;   % Thickness of pipe segments in plot    
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% FIGURE 1 - Temperature field   %%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 figure(1), clf
+
+%%%%% Case 1 - if only 2D, or if 3D with no z-separation provided
+% if size(x,2) == 2 | (size(x,2) == 3 & numel(unique([xo(:,3);x(:,3)]))==1)
+    
     axis equal
     xlabel('x(m)')
     ylabel('y(m)')
     xtotal = [xo; x];
     dmax = max(d);
     %subplot(3,1,1)
-        grid on
-        hold on 
-        colormap(jet)
-        caxis([max(min(min(Tp)),Tf), min(max(max(Tp)),Tr)]);
-%         caxis([min(min(Tp)) Tr]);
-        for ip = 1:np
-            x1 = xtotal(pipe_nodes(ip,1),1);
-            x2 = xtotal(pipe_nodes(ip,2),1);
-            y1 = xtotal(pipe_nodes(ip,1),2);
-            y2 = xtotal(pipe_nodes(ip,2),2);
-            T1 = Tp(ip,1);
-            T2 = Tp(ip,2);
-            z1 = 0;
-            z2 = 0;
-            x = [x1 x2];
-            y = [y1 y2];
-            z = [z1 z2];
-            col = [T1 T2];
-            surface([x;x],[y;y],[z;z],[col;col],... 
-                    'facecol','no',... 
-                    'edgecol','interp',...
-                    'linew',d(ip)/dmax*dplot);
-            if (nn<20) 
-                plot(xtotal(:,1), xtotal(:,2),'ko','MarkerSize',10,'MarkerFaceColor', 'k')
-            end
+    grid on
+    hold on
+    colormap(colourBar)
+    caxis([max(min(min(Tp)),Tf), min(max(max(Tp)),Tr)]);
+    %         caxis([min(min(Tp)) Tr]);
+    for ip = 1:np
+        x1 = xtotal(pipe_nodes(ip,1),1);
+        x2 = xtotal(pipe_nodes(ip,2),1);
+        y1 = xtotal(pipe_nodes(ip,1),2);
+        y2 = xtotal(pipe_nodes(ip,2),2);
+        T1 = Tp(ip,1);
+        T2 = Tp(ip,2);
+        z1 = 0;
+        z2 = 0;
+        x = [x1 x2];
+        y = [y1 y2];
+        z = [z1 z2];
+        col = [T1 T2];
+        surface([x;x],[y;y],[z;z],[col;col],...
+            'facecol','no',...
+            'edgecol','interp',...
+            'linew',d(ip)/dmax*dplot);
+        if (nn<20)
+            plot(xtotal(:,1), xtotal(:,2),'ko','MarkerSize',10,'MarkerFaceColor', 'k')
         end
-        hcb = colorbar;
-        title(hcb,'T(^oC)')
+    end
+    plot(xtotal(qin_node,1),xtotal(qin_node,2),'co','markerfacecolor','c')
+    %         text(xtotal(qin_node,1),xtotal(qin_node,2),'\downarrow','color','c')
+    hold on
+    plot(xtotal(qout_node,1),xtotal(qout_node,2),'ro','markerfacecolor','r')
+    hcb = colorbar;
+    hcb.Label.String = 'Temperature';
+    title(hcb,'T(^oC)')
+    
+% elseif size(x,2) == 3 & numel(unique([xo(:,3);x(:,3)]))~=1
+%     
+%         xtotal = [xo; x];
+%         seamDepths = sort(unique([xo(:,3);x(:,3)]),'ascend');
+%         seamTitle = {'Lower Seam','Upper Seam'};
+        
+%     for i = 1:2
+%         subplot(1,2,i)   %%%% Lower seam
+%         
+%         axis equal
+%         xlabel('x(m)')
+%         ylabel('y(m)')
+%         dmax = max(d);
+%         xtotalSeam = xtotal(xtotal(:,3)==seamDepths(i),:);
+%         grid on
+%         hold on
+%         colormap(colourBar)
+%         caxis([max(min(min(Tp)),Tf), min(max(max(Tp)),Tr)]);
+%         %         caxis([min(min(Tp)) Tr]);
+%         for ip = 1:np
+%             if xtotal(pipe_nodes(ip,1),3) == seamDepths(i) & xtotal(pipe_nodes(ip,2),3) == seamDepths(i);
+%             x1 = xtotal(pipe_nodes(ip,1),1);
+%             x2 = xtotal(pipe_nodes(ip,2),1);
+%             y1 = xtotal(pipe_nodes(ip,1),2);
+%             y2 = xtotal(pipe_nodes(ip,2),2);
+%             T1 = Tp(ip,1);
+%             T2 = Tp(ip,2);
+%             z1 = 0;
+%             z2 = 0;
+%             x = [x1 x2];
+%             y = [y1 y2];
+%             z = [z1 z2];
+%             col = [T1 T2];
+%             surface([x;x],[y;y],[z;z],[col;col],...
+%                 'facecol','no',...
+%                 'edgecol','interp',...
+%                 'linew',d(ip)/dmax*dplot);
+%             if (nn<20)
+%                 plot(xtotal(:,1), xtotal(:,2),'ko','MarkerSize',10,'MarkerFaceColor', 'k')
+%             end
+%         end
+%         plot(xtotal(qin_node,1),xtotal(qin_node,2),'co','markerfacecolor','c')
+%         %         text(xtotal(qin_node,1),xtotal(qin_node,2),'\downarrow','color','c')
+%         hold on
+%         plot(xtotal(qout_node,1),xtotal(qout_node,2),'ro','markerfacecolor','r')
+%         hcb = colorbar;
+%         hcb.Label.String = 'Temperature';
+%         title(hcb,'T(^oC)')
+%         title(seamTitle{i})
+%         
+%         end
+%     end
+    
+    
+% end
+
+        
+        
         %view(2)
         
 % f2 = figure('visible','off'); clf
@@ -99,11 +176,16 @@ figure(1), clf
 %             'MarkerFaceColor','r');
 %     end
     
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% FIGURE 2 - Flow field   %%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 figure(2), clf
     axis equal
     hold on 
     grid on
-    colormap(jet)
+    colormap(colourBar)
     minQ = min(Q);
     maxQ = max(Q);
     dQ = maxQ-minQ;
@@ -136,13 +218,18 @@ figure(2), clf
     end
     hcb = colorbar;
     title(hcb,'Q(m^3/sec)')
+    hcb.Label.String = 'Volumetric Flow Rate, Q';
     view(2)
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% FIGURE 3 - Hydraulic head distribution %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
     
 figure(3), clf
     axis equal
     grid on
     hold on 
-    colormap(jet)
+    colormap(colourBar)
     Htotal = [Ho; H];
     caxis([min(min(Htotal)) max(max(Htotal))]);
     %caxis([0.3 0.6]);
@@ -171,7 +258,9 @@ figure(3), clf
     title(hcb,'H(m)')
     view(2)
     
-if igeom ==1 || igeom==101 || igeom==102
+    
+switch igeom 
+    case (1 | 101 | 102)
     figure(4), clf
         x = xtotal(:,1);    % x-coordinates
         hold on

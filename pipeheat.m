@@ -1,14 +1,23 @@
-function Tout = pipeheat (r, l, Tin, k_r, Cp_r, rho_r, Tr, v, t)
+function Tout = pipeheat (r, l, Tin, k_r, Cp_r, rho_r, Tr, v, t,PhysicalProperties,testbank)
 % Calculates temperature change in pipe segment due to 
 % heat exchange with pipe wall
 % method from (Rodriguez & Diaz, 2009)
 verbose = 0;
 
-% fluid properties
-k_f   = 0.58;     % water heat conductivity (W/m,K)
-nu_f  = 1.2e-6;  % water kinematic viscocity (m^2/s)
-rho_f = 1000;     % water density (kg/m^3)
-Cp_f  = 4186;     % water specific heat (J/kg,K)
+if (testbank == 1 || testbank == 1)
+    % Fluid properties - testbank 
+    k_f   = 0.58;     % water heat conductivity (W/m,K)
+    nu_f  = 1.2e-6;   % water kinematic viscocity (m^2/s)
+    rho_f = 1000;     % water density (kg/m^3)
+    Cp_f  = 4186;     % water specific heat (J/kg,K)
+else
+    % Fluid properties - user specified
+    k_f = PhysicalProperties.k_f;       % water heat conductivity (W/m,K)
+    nu_f = PhysicalProperties.nu_f;     % water kinematic viscocity (m^2/s)
+    rho_f = PhysicalProperties.rho_f;   % water density (kg/m^3)
+    Cp_f = PhysicalProperties.Cp_f;     % water specific heat (J/kg,K)
+end
+
 
 VF = pi*r^2*v;    % fluid flux = cross_pipe surface * velocity (m^3/s)
 
@@ -32,7 +41,7 @@ elseif imethod == 2
            fprintf('WARNING: pipeheat.m, r0 calc., imethod=2: no convergence in %d iterations\n',niter);
            break;
        end
-       L = log (r0_in/r);
+       L = log(r0_in/r);
        r0_out =  r * sqrt(1 + 4*k_r/(rho_r*Cp_r*r^2)*t + L);
        if abs(r0_in - r0_out)/r0_in<1e-5
            break;

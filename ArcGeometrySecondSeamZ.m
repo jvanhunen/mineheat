@@ -76,6 +76,7 @@ for ipoint = 1:npoints1
     nodeid = T1(ipoint).NODEID;
     xtemp(nodeid,:) = [T1(ipoint).POINT_X,T1(ipoint).POINT_Y,T1(ipoint).POINT_Z];
 end
+
 for ipoint = 1:npoints2
     nodeid = ntemp1+T2(ipoint).NODEID;
     xtemp(nodeid,:) = [T2(ipoint).POINT_X,T2(ipoint).POINT_Y,T2(ipoint).POINT_Z];

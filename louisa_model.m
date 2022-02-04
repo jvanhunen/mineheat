@@ -24,6 +24,7 @@ x = geom(3:end,2:3);
 A10 = geom(:,5:6);
 
 A12 = geom(:,7:end);
+% A12 = sparse(geom(:,7:end));
 
 % % pipe diameters: set in mine_geothermal
 % d   = d_in*ones(np,1);

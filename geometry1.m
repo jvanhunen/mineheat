@@ -17,13 +17,13 @@ total_length = 1000;  %total gallery length in m
 A12 = sparse(np,nn);
 A10 = sparse(np,no);
 A11inv = sparse(np,np);
-xo  = zeros(no,3);
-x   = zeros(nn,3);
+xo  = zeros(no,2);
+x   = zeros(nn,2);
 
 % locations of nodes:
 segment_length = total_length/np;   % e.g. 10 for 1km pipe
-xo(1,:) = [0 0 0];
-xo(2,:) = [np*segment_length 0 0];
+xo(1,:) = [0 0];
+xo(2,:) = [np*segment_length 0];
 x(:,1)=linspace(segment_length, nn*segment_length, nn)';
 % In linear pipe configuration, for each node in, pipe in feeds into 
 % node in, and pipe in+1 leaves node in:
@@ -31,6 +31,8 @@ for in=1:nn
     A12(in,in) = 1;
     A12(in+1,in) = -1;
 end
+
+
 
 % first fixed-head node has outgoing pipe (i.e. defined as at beginning of
 % pipe)

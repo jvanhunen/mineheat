@@ -1,4 +1,4 @@
-function [nn, no, np, A12, A10, xo, x] = ArcGeometry(UserShapefile)
+function [nn, no, np, A12, A10, xo, x] = UserArcGeometry(UserShapefile)
 
 %%%% Step 1- Read mine plans in from ArcGis shapefile
 

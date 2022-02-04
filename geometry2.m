@@ -23,23 +23,23 @@ np  = 8;      % nr of pipes
 A12 = sparse(np,nn);
 A10 = sparse(np,no);
 A11inv = sparse(np,np);
-xo  = zeros(no,3);
-x   = zeros(nn,3);
+xo  = zeros(no,2);
+x   = zeros(nn,2);
 
 % locations of nodes: 
-xo(1,:) = [  0 100 0];
-xo(2,:) = [400 100 0];
-x(1,:)  = [100   0 0];
-x(2,:)  = [200   0 0];
-x(3,:)  = [300   0 0];
-x(4,:)  = [100 200 0];
-x(5,:)  = [200 200 0];
-x(6,:)  = [300 200 0];
+xo(1,:) = [  0 100];
+xo(2,:) = [400 100];
+x(1,:)  = [100   0];
+x(2,:)  = [200   0];
+x(3,:)  = [300   0];
+x(4,:)  = [100 200];
+x(5,:)  = [200 200];
+x(6,:)  = [300 200];
 
 % General definition of matrix A12 (and A10): 
 %    A12(ip,in) = if    
 %    means: if if==1, then pipe ip feeds into node in
-%           if if==-2, then pipe ip flows out of node in
+%           if if==-2, then pipe ip flows out of node in == -1?
 % In linear pipe configuration, for each node in, pipe in feeds into 
 % node in, and pipe in+1 leaves node in:
 for in=1:3

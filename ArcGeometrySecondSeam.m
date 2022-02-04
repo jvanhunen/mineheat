@@ -29,7 +29,7 @@ for ipoint = 1:npoints1
 end
 np1 = max_pipe_id1;
 
-T2 = shaperead('LowerSeamShape.shp');
+T2 = shaperead('maps/LowerSeamShape.shp');
 sizeofT2 = size(T2);
 npoints2 = sizeofT2(1);
 flow_dir2 = zeros(npoints2,1);
@@ -104,3 +104,4 @@ A10 = Atemp(:,1);
 A12 = Atemp(:,2:end);
 xo = xtemp(1,:);
 x = xtemp(2:end,:);
+end

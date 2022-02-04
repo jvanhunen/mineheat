@@ -1,6 +1,6 @@
-function [Tn Tp] = mine_heat(t, d, L, Q, v, np, nn, no, Tf_ini,...
+function [Tn Tp] = mine_heat(nyrs, d, L, Q, v, np, nn, no, Tf_ini,...
     k_r, Cp_r, rho_r, Tr, npipes, node_pipes_in, node_pipes_out, pipe_nodes,...
-    xtotal) 
+    xtotal,PhysicalProperties,testbank) 
 
 % version 20210720 
 %    added warning for max nr iterations exceeded.
@@ -12,7 +12,9 @@ function [Tn Tp] = mine_heat(t, d, L, Q, v, np, nn, no, Tf_ini,...
 % More output needed? --> Set verbose to 1.
 verbose = 0;
 
-r=d/2;
+t = 3600*24*365*nyrs;
+r=d./2;
+
 
 % Solve for T in mine system: 
 Tnsolved = zeros(nn+no,1);  % Array to track if node has been solved yet.
@@ -56,9 +58,17 @@ end
 
 for in=1:nn+no
     if npipes(1,in)==0
-        % This node has no incoming pipes:
+%         % This node has no incoming pipes:
         Tnsolved(in)=1;   % Mark these nodes as 'temperature solved' 
         nnsolved = nnsolved+1;
+        
+        if (npipes(1,in) == 0 & npipes(2,in) == 1) | (npipes(1,in) == 1 & npipes(2,in) == 0)
+        %%%% If node is only connected to one pipe, regardless of flow type
+%         Tn(in) = Tr;   
+%         Tnsolved(in)=1;   % Mark these nodes as 'temperature solved' 
+%         nnsolved = nnsolved+1;
+        end
+        
     end
 end
 
@@ -82,7 +92,7 @@ while (nnsolved<nn+no)  % Not all node T's have been solved: continue
                 if Tpsolved(pipenr) == 0
                     Tp(pipenr,1) = Tn(in);
                     Tp(pipenr,2) = pipeheat (r(pipenr), L(pipenr), Tn(in),...
-                        k_r, Cp_r, rho_r, Tr, v(pipenr), t);
+                        k_r, Cp_r, rho_r, Tr, v(pipenr), t,PhysicalProperties,testbank);
                     Tpsolved(pipenr) = 1;
                     if (verbose) 
                         fprintf('Solved T for pipe %d: T= %f -> %f\n',pipenr,Tp(pipenr,1),Tp(pipenr,2))

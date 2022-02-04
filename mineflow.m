@@ -101,4 +101,5 @@ while (sumdQrel>1e-8 && maxdQrel>1e-10) %original option was 1e-8
 %         error('Error in flow calculation. Stuck in infinite loop.');
 %     end
 end
-H=Hnew;
+H=Hnew-min(Hnew);
+ end

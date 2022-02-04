@@ -1,0 +1,35 @@
+function [q_in, q_out] = testFlows(n_flows)
+
+      % Initialise flow locations
+        q_in  = cell(n_flows,1);
+        q_out = cell(n_flows,1);
+                
+        % Select node locations based on previous input      
+        switch n_flows
+            case 1
+                q_in{1}  = 1;
+                q_out{1} = 10;
+            case 2
+                q_in{1}  = 1;
+                q_out{1} = 71;
+                q_in{2}  = 10;
+                q_out{2} = 140;
+            case 3
+                q_in{1}  = 1;
+                q_out{1} = 3;
+                q_in{2}  = 5;
+                q_out{2} = 6;
+                q_in{3}  = 7;
+                q_out{3} = 10;
+            case 4
+                q_in{1}  = 1;
+                q_out{1} = 71;
+                q_in{2}  = 10;
+                q_out{2} = 140;
+                q_in{3}  = 141;
+                q_out{3} = 149;
+                q_in{4}  = 5;
+                q_out{4} = 35;
+        end
+
+end

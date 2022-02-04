@@ -16,8 +16,8 @@ function testbank_eval(itestbank, H, Q, Tn, Tp, igeom)
         loadfile = filename;
         fprintf('   --> Tested geometry %d:', igeom)
         load(loadfile,'Hstore', 'Qstore', 'Tnstore', 'Tpstore')
-        Hdiff = H - Hstore;
-        Qdiff = Q - Qstore;
+        Hdiff =  H - Hstore;
+        Qdiff =  Q - Qstore;
         Tndiff = Tn - Tnstore;
         Tpdiff = Tp - Tpstore;
         if (max(abs(Hdiff)) > 0 | max(abs(Qdiff)) > 0 | max(abs(Tndiff)) > 0 | max(abs(Tpdiff)) > 0)

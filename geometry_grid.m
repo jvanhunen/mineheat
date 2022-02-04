@@ -20,8 +20,8 @@ np  = (n-1)*m + (m-1)*n;     % nr of pipes
 A12 = sparse(np,nn);
 A10 = sparse(np,no);
 A11inv = sparse(np,np);
-xo  = zeros(no,3);
-x   = zeros(nn,3);
+xo  = zeros(no,2);
+x   = zeros(nn,2);
 
 if mod(n,2) == 0;
     id_max = n/2-1;    
@@ -32,7 +32,7 @@ id=id_max;
 
 % locations of boundary unknown-nodes:
 for in = 1:n*m
-    x(in,:) = [((in-1)-floor((in-1)/n)*n)*l1 floor((in-1)/n)*l2 0];
+    x(in,:) = [((in-1)-floor((in-1)/n)*n)*l1 floor((in-1)/n)*l2];
     if in==1 % corner1 - check
         A12(1,in) = -1;
         A12((n-1)*m+1,in) = -1;
@@ -90,10 +90,10 @@ if id == id_max
     A10((n-1)*m+(m-1)*n,2) = 1;
 
     % locations of known-nodes: 
-    xo(1,:) = [       0        0        0];
+    xo(1,:) = [       0        0];
     %xo(2,:) = [(n-1)*l1        0];
     %xo(2,:) = [       0 (m-1)*l2];
-    xo(2,:) = [(n-1)*l1 (m-1)*l2 0];
+    xo(2,:) = [(n-1)*l1 (m-1)*l2];
 
     % Remove the same node(s) from the unknown head matrix (A12) and the unknown head
     % locations matrix (x). Note: start with highest ranked nodes and work down

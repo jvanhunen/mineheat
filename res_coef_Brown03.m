@@ -8,9 +8,9 @@ function r = res_coef_Brown03(Q,L,d)
    %            g    = gravitational acceleration 
    % 
    % Note that this calculation is based on values/formulae for pipes
-   %   Not sure how valid this is for mine galleries
+   % Not sure how valid this is for mine galleries
    % 
-   eps = 0.1; % Darcy-Weisbach roughness coeff (e.g. 0.001)
+   eps = 0.1;  % Darcy-Weisbach roughness coeff (e.g. 0.001)
                % Values listed in EPANET manual Table 3.2, p.31 (in 1e-3 ft!)
                % On
                % https://en.wikipedia.org/wiki/Darcy%E2%80%93Weisbach_equation,

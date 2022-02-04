@@ -1,0 +1,3 @@
+function run_mine_geothermal(geometryID)
+mine_geothermal
+end
