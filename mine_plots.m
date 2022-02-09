@@ -6,8 +6,8 @@ function Tout = mine_plots (igeom, xo, x, d, np, nn, pipe_nodes, Tp, Tn, Q, H, H
 % Version 20210630 Jeroen van Hunen
 
 %%% Retrieve inflow and outflow nodes
-qin_node = find(q<0);
-qout_node = find(q>0);
+qin_node = find(q<0)+1;         % 
+qout_node = find(q>0)+1;
 
 dplot = 2;   % Thickness of pipe segments in plot    
 
@@ -15,22 +15,24 @@ dplot = 2;   % Thickness of pipe segments in plot
 %%% FIGURE 1 - Temperature field   %%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-figure(1), clf
 
+xtotal = [xo; x];
+dmax = max(d);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%% Case 1 - if only 2D, or if 3D with no z-separation provided
-% if size(x,2) == 2 | (size(x,2) == 3 & numel(unique([xo(:,3);x(:,3)]))==1)
-    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if size(x,2) == 2 | (size(x,2) == 3 & numel(unique([xo(:,3);x(:,3)]))==1)
+    figure(1), clf
     axis equal
     xlabel('x(m)')
     ylabel('y(m)')
-    xtotal = [xo; x];
-    dmax = max(d);
-    %subplot(3,1,1)
+    
+    %     subplot(3,1,1)
     grid on
     hold on
     colormap(colourBar)
-    caxis([max(min(min(Tp)),Tf), min(max(max(Tp)),Tr)]);
-    %         caxis([min(min(Tp)) Tr]);
+%     caxis([max(min(min(Tp)),Tf), min(max(max(Tp)),Tr)]);
+    caxis([Tf Tr]);
     for ip = 1:np
         x1 = xtotal(pipe_nodes(ip,1),1);
         x2 = xtotal(pipe_nodes(ip,2),1);
@@ -53,68 +55,152 @@ figure(1), clf
         end
     end
     plot(xtotal(qin_node,1),xtotal(qin_node,2),'co','markerfacecolor','c')
-    %         text(xtotal(qin_node,1),xtotal(qin_node,2),'\downarrow','color','c')
+%     text(xtotal(qin_node,1),xtotal(qin_node,2),'\downarrow','color','c')
     hold on
     plot(xtotal(qout_node,1),xtotal(qout_node,2),'ro','markerfacecolor','r')
     hcb = colorbar;
     hcb.Label.String = 'Temperature';
     title(hcb,'T(^oC)')
     
-% elseif size(x,2) == 3 & numel(unique([xo(:,3);x(:,3)]))~=1
-%     
-%         xtotal = [xo; x];
-%         seamDepths = sort(unique([xo(:,3);x(:,3)]),'ascend');
-%         seamTitle = {'Lower Seam','Upper Seam'};
-        
-%     for i = 1:2
-%         subplot(1,2,i)   %%%% Lower seam
-%         
-%         axis equal
-%         xlabel('x(m)')
-%         ylabel('y(m)')
-%         dmax = max(d);
-%         xtotalSeam = xtotal(xtotal(:,3)==seamDepths(i),:);
-%         grid on
-%         hold on
-%         colormap(colourBar)
-%         caxis([max(min(min(Tp)),Tf), min(max(max(Tp)),Tr)]);
-%         %         caxis([min(min(Tp)) Tr]);
-%         for ip = 1:np
-%             if xtotal(pipe_nodes(ip,1),3) == seamDepths(i) & xtotal(pipe_nodes(ip,2),3) == seamDepths(i);
-%             x1 = xtotal(pipe_nodes(ip,1),1);
-%             x2 = xtotal(pipe_nodes(ip,2),1);
-%             y1 = xtotal(pipe_nodes(ip,1),2);
-%             y2 = xtotal(pipe_nodes(ip,2),2);
-%             T1 = Tp(ip,1);
-%             T2 = Tp(ip,2);
-%             z1 = 0;
-%             z2 = 0;
-%             x = [x1 x2];
-%             y = [y1 y2];
-%             z = [z1 z2];
-%             col = [T1 T2];
-%             surface([x;x],[y;y],[z;z],[col;col],...
-%                 'facecol','no',...
-%                 'edgecol','interp',...
-%                 'linew',d(ip)/dmax*dplot);
-%             if (nn<20)
-%                 plot(xtotal(:,1), xtotal(:,2),'ko','MarkerSize',10,'MarkerFaceColor', 'k')
-%             end
-%         end
-%         plot(xtotal(qin_node,1),xtotal(qin_node,2),'co','markerfacecolor','c')
-%         %         text(xtotal(qin_node,1),xtotal(qin_node,2),'\downarrow','color','c')
-%         hold on
-%         plot(xtotal(qout_node,1),xtotal(qout_node,2),'ro','markerfacecolor','r')
-%         hcb = colorbar;
-%         hcb.Label.String = 'Temperature';
-%         title(hcb,'T(^oC)')
-%         title(seamTitle{i})
-%         
-%         end
-%     end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%% Case 2 -  3D with z-separation provided
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+elseif size(x,2) == 3 & numel(unique([xo(:,3);x(:,3)]))~=1
+    seamDepths = sort(unique(xtotal(:,3)),'ascend');
+    Z1 = xtotal(pipe_nodes(:,1),3);
+    Z2 = xtotal(pipe_nodes(:,2),3);
+    lowerSeam = find(Z1 == Z2 & Z1 == seamDepths(1));
+    upperSeam = find(Z1 == Z2 & Z1 == seamDepths(2)); 
+    linkPipe = find(Z1 ~= Z2);
     
+    figure(1), clf
+    axis equal
+    xlabel('x(m)')
+    ylabel('y(m)')
+    grid on
+    hold on
+    title('Lower Seam')
+    colormap(colourBar)
+    caxis([Tf Tr]);
+    for ip = 1:np
+        if ismember(ip,[lowerSeam; linkPipe]) == 1              
+            x1 = xtotal(pipe_nodes(ip,1),1);
+            x2 = xtotal(pipe_nodes(ip,2),1);
+            y1 = xtotal(pipe_nodes(ip,1),2);
+            y2 = xtotal(pipe_nodes(ip,2),2);
+            T1 = Tp(ip,1);
+            T2 = Tp(ip,2);
+            z1 = 0;
+            z2 = 0;
+            x = [x1 x2];
+            y = [y1 y2];
+            z = [z1 z2];
+            col = [T1 T2];
+            surface([x;x],[y;y],[z;z],[col;col],...
+                'facecol','no',...
+                'edgecol','interp',...
+                'linew',d(ip)/dmax*dplot);
+            
+            if ip == linkPipe
+               plot(xtotal(pipe_nodes(ip,1),1), xtotal(pipe_nodes(ip,1),2),'kx','markerfacecolor','k')
+               hold on
+               plot(xtotal(pipe_nodes(ip,2),1), xtotal(pipe_nodes(ip,2),2),'kx','markerfacecolor','k')
+            end
+            
+            if (nn<20)
+                plot(xtotal(:,1), xtotal(:,2),'ko','MarkerSize',10,'MarkerFaceColor', 'k')
+            end
+            
+            %%%% Plot inflow and outflow locations
+            if ismember(pipe_nodes(ip,1),qin_node) == 1
+                plot(xtotal(pipe_nodes(ip,1),1),xtotal(pipe_nodes(ip,1),2),'co','markerfacecolor','c')
+            elseif ismember(pipe_nodes(ip,2),qin_node) == 1
+                plot(xtotal(pipe_nodes(ip,2),1),xtotal(pipe_nodes(ip,2),2),'co','markerfacecolor','c')
+            elseif ismember(pipe_nodes(ip,1),qout_node) == 1
+                plot(xtotal(pipe_nodes(ip,1),1),xtotal(pipe_nodes(ip,1),2),'ro','markerfacecolor','r')
+            elseif ismember(pipe_nodes(ip,2),qout_node) == 1
+                plot(xtotal(pipe_nodes(ip,2),1),xtotal(pipe_nodes(ip,2),2),'ro','markerfacecolor','r')
+                
+            %%%% Plot link pipe locations
+            elseif ismember(pipe_nodes(ip,1),linkPipe) == 1
+                plot(xtotal(pipe_nodes(ip,1),1),xtotal(pipe_nodes(ip,1),2),'kx','markerfacecolor','k')
+            elseif ismember(pipe_nodes(ip,2),linkPipe) == 1
+                plot(xtotal(pipe_nodes(ip,2),1),xtotal(pipe_nodes(ip,2),2),'kx','markerfacecolor','k')
+            end
+        end
+    end 
     
-% end
+    hcb = colorbar;
+    hcb.Label.String = 'Temperature';
+    title(hcb,'T(^oC)')
+
+
+    figure(4), clf
+    axis equal
+    xlabel('x(m)')
+    ylabel('y(m)')
+    grid on
+    hold on
+    title('Upper Seam')
+    colormap(colourBar)
+    caxis([Tf Tr]);
+    for ip = 1:np
+        if ismember(ip,[upperSeam; linkPipe]) == 1
+            %         subplot(1,2,2)
+            x1 = xtotal(pipe_nodes(ip,1),1);
+            x2 = xtotal(pipe_nodes(ip,2),1);
+            y1 = xtotal(pipe_nodes(ip,1),2);
+            y2 = xtotal(pipe_nodes(ip,2),2);
+            T1 = Tp(ip,1);
+            T2 = Tp(ip,2);
+            z1 = 0;
+            z2 = 0;
+            x = [x1 x2];
+            y = [y1 y2];
+            z = [z1 z2];
+            col = [T1 T2];
+            surface([x;x],[y;y],[z;z],[col;col],...
+                'facecol','no',...
+                'edgecol','interp',...
+                'linew',d(ip)/dmax*dplot);
+            
+            if ip == linkPipe
+               plot(xtotal(pipe_nodes(ip,1),1), xtotal(pipe_nodes(ip,1),2),'ko','markerfacecolor','k')
+               hold on
+               plot(xtotal(pipe_nodes(ip,2),1), xtotal(pipe_nodes(ip,2),2),'ko','markerfacecolor','k')
+            end
+            
+            if (nn<20)
+                plot(xtotal(:,1), xtotal(:,2),'ko','MarkerSize',10,'MarkerFaceColor', 'k')
+            end      
+            
+            if ismember(pipe_nodes(ip,1),qin_node) == 1
+                plot(xtotal(pipe_nodes(ip,1),1),xtotal(pipe_nodes(ip,1),2),'co','markerfacecolor','c')
+            elseif ismember(pipe_nodes(ip,2),qin_node) == 1
+                plot(xtotal(pipe_nodes(ip,2),1),xtotal(pipe_nodes(ip,2),2),'co','markerfacecolor','c')
+            elseif ismember(pipe_nodes(ip,1),qout_node) == 1
+                plot(xtotal(pipe_nodes(ip,1),1),xtotal(pipe_nodes(ip,1),2),'ro','markerfacecolor','r')
+            elseif ismember(pipe_nodes(ip,2),qout_node) == 1
+                plot(xtotal(pipe_nodes(ip,2),1),xtotal(pipe_nodes(ip,2),2),'ro','markerfacecolor','r')
+            elseif ismember(pipe_nodes(ip,1),linkPipe) == 1
+                plot(xtotal(pipe_nodes(ip,1),1),xtotal(pipe_nodes(ip,1),2),'ko','markerfacecolor','k')
+            elseif ismember(pipe_nodes(ip,2),linkPipe) == 1
+                plot(xtotal(pipe_nodes(ip,2),1),xtotal(pipe_nodes(ip,2),2),'ko','markerfacecolor','k')
+            end
+            
+        end
+    end
+    hcb = colorbar;
+    hcb.Label.String = 'Temperature';
+    title(hcb,'T(^oC)')
+end
+
+
+       
+            
+    
+
 
         
         
@@ -181,6 +267,8 @@ figure(1), clf
 %%% FIGURE 2 - Flow field   %%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% if size(x,2) == 2 | (size(x,2) == 3 & numel(unique([xo(:,3);x(:,3)]))==1)
+
 figure(2), clf
     axis equal
     hold on 
@@ -220,6 +308,157 @@ figure(2), clf
     title(hcb,'Q(m^3/sec)')
     hcb.Label.String = 'Volumetric Flow Rate, Q';
     view(2)
+    
+    
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%% Case 2 -  3D with z-separation provided
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% elseif size(x,2) == 3 & numel(unique([xo(:,3);x(:,3)]))~=1
+%     disp('Separate flow')
+%     
+%     seamDepths = sort(unique(xtotal(:,3)),'ascend');
+%     Z1 = xtotal(pipe_nodes(:,1),3);
+%     Z2 = xtotal(pipe_nodes(:,2),3);
+%     lowerSeam = find(Z1 == Z2 & Z1 == seamDepths(1));
+%     upperSeam = find(Z1 == Z2 & Z1 == seamDepths(2)); 
+%     linkPipe = find(Z1 ~= Z2);
+%     
+%     figure(2), clf
+%     axis equal
+%     hold on 
+%     grid on
+%     colormap(colourBar)
+%     minQ = min(Q);
+%     maxQ = max(Q);
+%     dQ = maxQ-minQ;
+%     if (abs(dQ/maxQ)<0.01)
+%         eps = abs(0.01*maxQ);
+%     else
+%         eps = 0;
+%     end
+%     %caxis([minQ-eps maxQ+eps]);
+%     caxis([maxQ*1e-3 maxQ+eps]);
+%     set(gca,'ColorScale','log')
+%     for ip = 1:np
+%         if ismember(ip,[lowerSeam; linkPipe]) == 1              
+%             x1 = xtotal(pipe_nodes(ip,1),1);
+%             x2 = xtotal(pipe_nodes(ip,2),1);
+%             y1 = xtotal(pipe_nodes(ip,1),2);
+%             y2 = xtotal(pipe_nodes(ip,2),2);
+%             z1 = 0;
+%             z2 = 0;
+%             x = [x1 x2];
+%             y = [y1 y2];
+%             z = [z1 z2];
+%             col = [Q(ip) Q(ip)];
+%             surface([x;x],[y;y],[z;z],[col;col],...
+%                 'facecol','no',...
+%                 'edgecol','interp',...
+%                 'linew',d(ip)/dmax*dplot);
+% 
+%             if ip == linkPipe
+%                plot(xtotal(pipe_nodes(ip,1),1), xtotal(pipe_nodes(ip,1),2),'kx','markerfacecolor','k')
+%                hold on
+%                plot(xtotal(pipe_nodes(ip,2),1), xtotal(pipe_nodes(ip,2),2),'kx','markerfacecolor','k')
+%             end
+%             
+%             if (nn<20)
+%                 plot(xtotal(:,1), xtotal(:,2),'ko','MarkerSize',10,'MarkerFaceColor', 'k')
+%             end
+%             
+%             %%%% Plot inflow and outflow locations
+%             if ismember(pipe_nodes(ip,1),qin_node) == 1
+%                 plot(xtotal(pipe_nodes(ip,1),1),xtotal(pipe_nodes(ip,1),2),'co','markerfacecolor','c')
+%             elseif ismember(pipe_nodes(ip,2),qin_node) == 1
+%                 plot(xtotal(pipe_nodes(ip,2),1),xtotal(pipe_nodes(ip,2),2),'co','markerfacecolor','c')
+%             elseif ismember(pipe_nodes(ip,1),qout_node) == 1
+%                 plot(xtotal(pipe_nodes(ip,1),1),xtotal(pipe_nodes(ip,1),2),'ro','markerfacecolor','r')
+%             elseif ismember(pipe_nodes(ip,2),qout_node) == 1
+%                 plot(xtotal(pipe_nodes(ip,2),1),xtotal(pipe_nodes(ip,2),2),'ro','markerfacecolor','r')
+%                 
+%             %%%% Plot link pipe locations
+%             elseif ismember(pipe_nodes(ip,1),linkPipe) == 1
+%                 plot(xtotal(pipe_nodes(ip,1),1),xtotal(pipe_nodes(ip,1),2),'kx','markerfacecolor','k')
+%             elseif ismember(pipe_nodes(ip,2),linkPipe) == 1
+%                 plot(xtotal(pipe_nodes(ip,2),1),xtotal(pipe_nodes(ip,2),2),'kx','markerfacecolor','k')
+%             end
+%         end
+%     end 
+%     
+%     hcb = colorbar;
+%     title(hcb,'Q(m^3/sec)')
+%     hcb.Label.String = 'Volumetric Flow Rate, Q';
+%     view(2)
+% 
+% 
+%     figure(5), clf
+%     axis equal
+%     hold on 
+%     grid on
+%     colormap(colourBar)
+%     minQ = min(Q);
+%     maxQ = max(Q);
+%     dQ = maxQ-minQ;
+%     if (abs(dQ/maxQ)<0.01)
+%         eps = abs(0.01*maxQ);
+%     else
+%         eps = 0;
+%     end
+%     %caxis([minQ-eps maxQ+eps]);
+%     caxis([maxQ*1e-3 maxQ+eps]);
+%     set(gca,'ColorScale','log')
+%     for ip = 1:np
+%         if ismember(ip,[upperSeam; linkPipe]) == 1
+%             x1 = xtotal(pipe_nodes(ip,1),1);
+%             x2 = xtotal(pipe_nodes(ip,2),1);
+%             y1 = xtotal(pipe_nodes(ip,1),2);
+%             y2 = xtotal(pipe_nodes(ip,2),2);
+%             z1 = 0;
+%             z2 = 0;
+%             x = [x1 x2];
+%             y = [y1 y2];
+%             z = [z1 z2];
+%             col = [Q(ip) Q(ip)];
+%             surface([x;x],[y;y],[z;z],[col;col],...
+%                 'facecol','no',...
+%                 'edgecol','interp',...
+%                 'linew',d(ip)/dmax*dplot);
+%             
+%             if ip == linkPipe
+%                plot(xtotal(pipe_nodes(ip,1),1), xtotal(pipe_nodes(ip,1),2),'ko','markerfacecolor','k')
+%                hold on
+%                plot(xtotal(pipe_nodes(ip,2),1), xtotal(pipe_nodes(ip,2),2),'ko','markerfacecolor','k')
+%             end
+%             
+%             if (nn<20)
+%                 plot(xtotal(:,1), xtotal(:,2),'ko','MarkerSize',10,'MarkerFaceColor', 'k')
+%             end      
+%             
+%             if ismember(pipe_nodes(ip,1),qin_node) == 1
+%                 plot(xtotal(pipe_nodes(ip,1),1),xtotal(pipe_nodes(ip,1),2),'co','markerfacecolor','c')
+%             elseif ismember(pipe_nodes(ip,2),qin_node) == 1
+%                 plot(xtotal(pipe_nodes(ip,2),1),xtotal(pipe_nodes(ip,2),2),'co','markerfacecolor','c')
+%             elseif ismember(pipe_nodes(ip,1),qout_node) == 1
+%                 plot(xtotal(pipe_nodes(ip,1),1),xtotal(pipe_nodes(ip,1),2),'ro','markerfacecolor','r')
+%             elseif ismember(pipe_nodes(ip,2),qout_node) == 1
+%                 plot(xtotal(pipe_nodes(ip,2),1),xtotal(pipe_nodes(ip,2),2),'ro','markerfacecolor','r')
+%             elseif ismember(pipe_nodes(ip,1),linkPipe) == 1
+%                 plot(xtotal(pipe_nodes(ip,1),1),xtotal(pipe_nodes(ip,1),2),'ko','markerfacecolor','k')
+%             elseif ismember(pipe_nodes(ip,2),linkPipe) == 1
+%                 plot(xtotal(pipe_nodes(ip,2),1),xtotal(pipe_nodes(ip,2),2),'ko','markerfacecolor','k')
+%             end
+%             
+%         end
+%     end
+%     
+%     hcb = colorbar;
+%     title(hcb,'Q(m^3/sec)')
+%     hcb.Label.String = 'Volumetric Flow Rate, Q';
+%     view(2)
+%    
+% end    
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% FIGURE 3 - Hydraulic head distribution %
@@ -275,3 +514,4 @@ drawnow
 
 disp (['Max node temperature = ', num2str(max(abs(Tn))), ' degC']) % not correct, error in model
 disp (['Max flow rate = ', num2str(1e3*max(abs(Q))), ' litres/sec']) 
+end

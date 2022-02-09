@@ -18,7 +18,7 @@ r=d./2;
 
 % Solve for T in mine system: 
 Tnsolved = zeros(nn+no,1);  % Array to track if node has been fully solved yet.
-Tnstuck = zeros(nn+no,1);   % If no outflow;
+% Tnstuck = zeros(nn+no,1);   % If no outflow;
 Tpsolved = zeros(np,1);
 nnsolved = 0;
 solvedNode = zeros(nn,+no,1);
@@ -49,7 +49,7 @@ for inode = 1:nn+no                                            %%% Find inflow p
     
     
     sumQ = sumQin - sumQout;                                        %%% Calculate continuity
-    if (sumQ/Qmax<-1e-6)                                            %%% Significant external inflow at node in detected
+    if (sumQ/Qmax<-1e-6) %& (npipes(1,inode) ~=1) % - modification needed                                            %%% Significant external inflow at node in detected
         external_inflow = -sumQ;                                    %%% Assign external inflow rate to the difference
         Tn(inode)=Tf_ini*external_inflow/(sumQin+external_inflow);  %%% Give all these nodes initial inflow T at first
     elseif (sumQin/Qmax<1e-6 && sumQout/Qmax<1e-6)                  %%% No significant in or outflow at node in detected: stagnant point, set T=Tr
@@ -67,8 +67,8 @@ for inode = 1:nn+no                                            %%% Find inflow p
 end
 
 for in=1:nn+no
-    if  npipes(1,in)==0   %%% This node has no incoming pipes --> therefore no additional contributions needed, and is NOT on edge of map
-        % | (npipes(2,in)==1 & sum(node_pipes_in(:,in) ==0)) 
+    if  npipes(1,in)==0 %& npipes(2,in)>1 % & sum(  %%% This node has no incoming pipes --> therefore no additional contributions needed, and is NOT on edge of map
+                                         % | (npipes(2,in)==1 & sum(node_pipes_in(:,in) ==0)) 
         
         Tnsolved(in)=1;  
         nnsolved = nnsolved+1; %%% Mark these nodes as 'temperature solved' - means we only need to consider these nodes once in the while loop 
@@ -84,19 +84,19 @@ end
 nitmax=nn+no;
 nit=0;
 
-% %%%%% Progressively plot solution
-XX = [xo;x];        %%% Get coordinates of nodes
-figure()           
-clf                 %%% Clear figure from last run
-hold on
-plot(XX(:,1),XX(:,2),'.','color',[220 220 220]./256)             %%% Plot all nodes in light grey
-for p = 1:np
-   plot(XX(pipe_nodes(p,:),1),XX(pipe_nodes(p,:),2),'-','color',[220 220 220]./256)
-end
-
-scatter(XX(find(Tn~=0),1),XX(find(Tn~=0),2),5,Tn(find(Tn~=0)),'filled')
-title({['Nodes assigned Tr prior to'];['"downstream" calaculation of temperatures']})
-
+%%%%% Progressively plot solution
+% XX = [xo;x];        %%% Get coordinates of nodes
+% figure()           
+% clf                 %%% Clear figure from last run
+% hold on
+% plot(XX(:,1),XX(:,2),'.','color',[220 220 220]./256)             %%% Plot all nodes in light grey
+% for p = 1:np
+%    plot(XX(pipe_nodes(p,:),1),XX(pipe_nodes(p,:),2),'-','color',[220 220 220]./256)
+% end
+% % 
+% % scatter(XX(find(Tn~=0),1),XX(find(Tn~=0),2),5,Tn(find(Tn~=0)),'filled')
+% % title({['Nodes assigned Tr prior to'];['"downstream" calaculation of temperatures']})
+% 
 % axis([min(XX(:,1)) max(XX(:,1)) min(XX(:,2)) max(XX(:,2))])      %%% Set axis to stop constant re-sizing
 % axis equal
 % 
@@ -104,7 +104,7 @@ title({['Nodes assigned Tr prior to'];['"downstream" calaculation of temperature
 % plot(XX(find(Tnstuck == 1),1), XX(find(Tnstuck == 1),2),'r.') 
 % %%%%%%%%
 
-while (nnsolved<nn+no)  %%% Not all node T's have been solved: continue
+while (nnsolved<(nn+no))  %%% Not all node T's have been solved: continue
     
     
     if nit>=nitmax
@@ -178,16 +178,36 @@ end
 %%%% Deal with unsolved nodes
 if nnsolved <nn+no
    for in = 1:nn+no
-       if Tn(in) > Tr;
-       Tn(in) = Tr;       
-       end
        
+%        if Tn(in) > Tr;
+%        Tn(in) = Tr;       
+%        end
+%        
+      
       if Tnsolved(in) < npipes(1,in)
          for ip = 1:npipes(2,in)
              pipenr = node_pipes_out(ip,in);
-             Tp(pipenr,:) = Tn(in);
+
+             Tp(pipenr,1) = Tr;
+             Tp(pipenr,2) = Tr;
+             
+             end_node = pipe_nodes(pipenr,2);
+             
+             Tn(end_node) = Tn(end_node) + weighted_flow_in(pipenr)*Tp(pipenr,1);
+
+            
+      
          end         
-      end             
+      end                 
+     
+      
+%        if Tp(in,1)>Tr 
+%            Tp(in,1) = Tr;
+%        end
+%        
+%        if Tp(in,2) > Tr
+%           Tp(in,2) = Tr; 
+%        end
    end          
 end
 

@@ -34,7 +34,7 @@ verbose = 0;
 %%% setting values to variables in the PRE-PROCESSING section
 
 % Geometry used for calculation (not used if testbank!=0):
-igeom = 103; %'UserDefinedGeometry-CommandLinePrompts'; 
+igeom = 11; %'UserDefinedGeometry-CommandLinePrompts'; 
 alltests = igeom; 
 
 % Testbank

@@ -218,9 +218,10 @@ switch igeom
         Ho(1) = 0;
         
         
-        n_flows = 2;
+        n_flows = 1;
         [q_in q_out] = testFlows(n_flows);
-        
+%         q_in = q_in + 1;
+%         q_out = q_out+1;
         % Check inflow/outflow locations fit in nodal space
         if max([q_in{:}]) > nn || max([q_out{:}]) > nn
             error('q_in and/or q_out locations are greater than nodal space of mine model. Choose different q_in and/or q_out.');
@@ -361,24 +362,18 @@ switch igeom
     case 'UserDefinedGeometry-CommandLinePrompts'
         
         %%%% Ask user how many seams they wish to use
-        list = {'Single Seam', 'Multiple Seams'};
+        list = {'Single Seam', 'Two Seams'};
         [indx, ~] = listdlg('ListString',list,'SelectionMode','single');
-        waitfor(indx);
-        
-        
+          
         switch indx
             case 1
                 [nn, no, np, A12, A10, xo, x, Ho, q, idiagn] = UserDefinedGeometry(head);
                 
             case 2
-                [nn, no, np, A12, A10, xo, x, Ho, q, idiagn] = UserDefinedGeometrySecondSeam(head);
-                
+                [nn, no, np, A12, A10, xo, x, Ho, q, idiagn] = UserDefinedGeometryTwoSeams(head);
+                    
         end
-    
-    case 'UserDefinedGeometry-MultipleSeams'
-        
-        
-        
+
 end
 
 end

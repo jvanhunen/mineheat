@@ -4,22 +4,6 @@ function [nn, no, np, A12, A10, xo, x] = UserArcGeometry(UserShapefile)
 
 S = shaperead(UserShapefile);
 
-%%%% S is an object with attiributes as follows:
-%%%%
-%%%% S.Geometry
-%%%% S.X
-%%%% S.Y
-%%%% S.Join_Count
-%%%% S.TARGET_FID
-%%%% S.POINT_X
-%%%% S.POINT_Y
-%%%% S.NODEID
-%%%% S.EXT_MIN_X
-%%%% S.EXT_MIN_Y
-%%%% S.EXT_MAX_X
-%%%% S.EXT_MAX_Y
-%%%% S.PIPEID
-
 %%%% 
 sizeofS = size(S);
 npoints = sizeofS(1);
@@ -62,9 +46,9 @@ np = max_pipe_id;
 no  = 1;       % nr of fixed head nodes
 
 % Parameters to be solved in this function:
-Atemp = zeros(np,ntemp);
+Atemp = sparse(np,ntemp);
 A11inv = sparse(np,np);
-xtemp   = zeros(ntemp,2);
+xtemp   = sparse(ntemp,2);
 
 % locations of nodes
 for ipoint = 1:npoints
@@ -93,9 +77,12 @@ Atemp;
 no=1;
 nn = ntemp-1;
 A10 = Atemp(:,1);
+A10 = sparse(A10);
 A12 = Atemp(:,2:end);
+A12 = sparse(A12);
 xo = xtemp(1,:);
 x = xtemp(2:end,:);
+end
 
 % % pipe diameters: set in mine_geothermal
 % d   = 4*ones(np,1);
