@@ -1,7 +1,11 @@
-function Tout = pipeheat (r, l, Tin, k_r, Cp_r, rho_r, Tr, v, t,PhysicalProperties,testbank)
+function [Tout, r0] = pipeheat (r, l, Tin, k_r, Cp_r, rho_r, Tr, v, t,PhysicalProperties,testbank)
 % Calculates temperature change in pipe segment due to 
 % heat exchange with pipe wall
 % method from (Rodriguez & Diaz, 2009)
+% JMC updated it to subsegment the pipe in small intervals
+
+il = 1; % pipe segment interval length
+il = min(il,l); % ensures il isn't longer than the pipe itself
 verbose = 0;
 
 if (testbank == 1 || testbank == 1)
@@ -41,7 +45,7 @@ elseif imethod == 2
            fprintf('WARNING: pipeheat.m, r0 calc., imethod=2: no convergence in %d iterations\n',niter);
            break;
        end
-       L = log(r0_in/r);
+       L = log(r0_in/r); % Ask JvH for doc showing derivation
        r0_out =  r * sqrt(1 + 4*k_r/(rho_r*Cp_r*r^2)*t + L);
        if abs(r0_in - r0_out)/r0_in<1e-5
            break;
@@ -57,11 +61,15 @@ end
 % effective heat transfer coeff for fluid + wall:
 U = (1/h_f + r/k_r*log(r0/r))^-1;
 
-% Outflow T using eqn 4 in Rodriguez & Diaz (2009):
-coef1 = 2*pi*r*l*U*Tr;
-coef2 = rho_f*Cp_f*VF;
-coef3 = pi*r*l*U;
-Tout = (coef1 + (coef2-coef3)*Tin) / (coef2+coef3);
+for i = 1:l/il
+    % Outflow T using eqn 4 in Rodriguez & Diaz (2009):
+    coef1 = 2*pi*r*il*U*Tr;
+    coef2 = rho_f*Cp_f*VF;
+    coef3 = pi*r*il*U;
+    Tout = (coef1 + (coef2-coef3)*Tin) / (coef2+coef3);
+    Tin = Tout;
+end
+
 if verbose
     L = log (r0/r);
     Tp = (k_r/L*Tr+r*h_f*Tout)/(k_r/L + r*h_f);

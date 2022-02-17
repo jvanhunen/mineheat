@@ -235,7 +235,7 @@ for irun = 1:ntests
     
 
     %%% Setup pipe flow arrays:
-    [pipe_nodes npipes node_pipes_out node_pipes_in Q, v] ...
+    [pipe_nodes npipes node_pipes_out node_pipes_in Q, v, n_tree, id_tree] ...
            = mine_array_setup('2', np, nn, no, A10, A12, pipe_nodes, q, Q, d);
 
     %%% Calculate temperature of pipe system:
@@ -244,13 +244,8 @@ for irun = 1:ntests
     disp('Running: mine_heat.m - calculating nodal and pipe temperatures')
 
     %   Current script for mine_heat - contains fixes for known bugs
-      [Tn Tp]= mine_heat_debug(nyrs, d, L, Q, v, np, nn, no, Tf_ini, k_r, Cp_r, rho_r,...
-        Tr, npipes, node_pipes_in, node_pipes_out, pipe_nodes,xtotal,PhysicalProperties,testbank,x,xo);
-
-    %    Uncomment to run old mine_heat code
-    %            - version contains bug in low flow regions resutling in unslved pipes
-    %     [Tn Tp]= mine_heat(nyrs, d, L, Q, v, np, nn, no, Tf_ini, k_r, Cp_r, rho_r,...
-    %         Tr, npipes, node_pipes_in, node_pipes_out, pipe_nodes,xtotal,PhysicalProperties,testbank);
+    [Tn Tp rp]= mine_heat(nyrs, d, L, Q, v, np, nn, no, Tf_ini, k_r, Cp_r, rho_r,...
+        Tr, npipes, node_pipes_in, node_pipes_out, pipe_nodes,xtotal,PhysicalProperties,testbank,x,xo, n_tree, id_tree);
 
     disp('Call complete: thermal calculation sucessful')
     disp('-------')
@@ -304,7 +299,7 @@ switch figureFlag
             %     disp('Plotting... Please wait');
             disp('Running: mineplots.m - plotting outputs')
             tic
-            mine_plots (igeom, xo, x, d, np, nn, pipe_nodes, Tp, Tn, Q, H, Ho, Tr, Tf_ini, q, inferno)
+            mine_plots (igeom, xo, x, d, np, nn, pipe_nodes, Tp, Tn, Q, H, Ho, Tr, Tf_ini, q, inferno, rp)
             toc
         end
 end

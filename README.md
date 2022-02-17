@@ -2,6 +2,11 @@
 
 To run the code, run the mine_geothermal.m file
 
+Update 20220217 JMC:
+- compute heat along pipe iteratively
+- revised heat algo from nested for loops to search tree connecting flowing pipes
+- ploting heat as node temperatures rather than pipe temperatures
+
 Update 20210723 JvH:
 - added new r0 calculation in pipeheat.m
 - this slightly changes all T calculations, so ran new set of benchmark testbanks results

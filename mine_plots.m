@@ -1,8 +1,9 @@
-function Tout = mine_plots (igeom, xo, x, d, np, nn, pipe_nodes, Tp, Tn, Q, H, Ho, Tr, Tf, q, colourBar)
+function Tout = mine_plots (igeom, xo, x, d, np, nn, pipe_nodes, Tp, Tn, Q, H, Ho, Tr, Tf, q, colourBar, rp)
 % 
 % This routine plots temperature T, flow Q and fluid pressure (hydraulic
 % head ) H distributions across the mine network.
-%
+% version 20220217 JMC added thermal drawdown radii plot (glitched) and
+% replaced pipe temperatures with nodal temperatures
 % Version 20210630 Jeroen van Hunen
 
 %%% Retrieve inflow and outflow nodes
@@ -38,8 +39,8 @@ if size(x,2) == 2 | (size(x,2) == 3 & numel(unique([xo(:,3);x(:,3)]))==1)
         x2 = xtotal(pipe_nodes(ip,2),1);
         y1 = xtotal(pipe_nodes(ip,1),2);
         y2 = xtotal(pipe_nodes(ip,2),2);
-        T1 = Tp(ip,1);
-        T2 = Tp(ip,2);
+        T1 = Tn(pipe_nodes(ip,1));
+        T2 = Tn(pipe_nodes(ip,2));
         z1 = 0;
         z2 = 0;
         x = [x1 x2];
@@ -89,8 +90,8 @@ elseif size(x,2) == 3 & numel(unique([xo(:,3);x(:,3)]))~=1
             x2 = xtotal(pipe_nodes(ip,2),1);
             y1 = xtotal(pipe_nodes(ip,1),2);
             y2 = xtotal(pipe_nodes(ip,2),2);
-            T1 = Tp(ip,1);
-            T2 = Tp(ip,2);
+            T1 = Tn(pipe_nodes(ip,1));
+            T2 = Tn(pipe_nodes(ip,2));
             z1 = 0;
             z2 = 0;
             x = [x1 x2];
@@ -152,8 +153,8 @@ elseif size(x,2) == 3 & numel(unique([xo(:,3);x(:,3)]))~=1
             x2 = xtotal(pipe_nodes(ip,2),1);
             y1 = xtotal(pipe_nodes(ip,1),2);
             y2 = xtotal(pipe_nodes(ip,2),2);
-            T1 = Tp(ip,1);
-            T2 = Tp(ip,2);
+            T1 = Tn(pipe_nodes(ip,1));
+            T2 = Tn(pipe_nodes(ip,2));
             z1 = 0;
             z2 = 0;
             x = [x1 x2];
@@ -494,9 +495,52 @@ figure(3), clf
         end
     end
     hcb = colorbar;
-    title(hcb,'H(m)')
-    view(2)
-    
+    title(hcb,'H(m)');
+    view(2);
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%% FIGURE 5 - Thermal drawdown radii %
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
+% % JMC appears to be glitched and causing warning in plotting lib
+% figure(5), clf
+%     axis equal
+%     hold on 
+%     grid on
+%     colormap(colourBar)
+%     minr = min(rp);
+%     maxr = max(rp);
+%     dr = maxr-minr;
+%     if (abs(dr/maxr)<0.01)
+%         eps = abs(0.01*maxr);
+%     else
+%         eps = 0;
+%     end
+%     %caxis([minQ-eps maxQ+eps]);
+%     caxis([maxr*1e-3 maxr+eps]);
+%     set(gca,'ColorScale','log')
+%     for ip = 1:np
+%         x1 = xtotal(pipe_nodes(ip,1),1);
+%         x2 = xtotal(pipe_nodes(ip,2),1);
+%         y1 = xtotal(pipe_nodes(ip,1),2);
+%         y2 = xtotal(pipe_nodes(ip,2),2);
+%         z1 = 0;
+%         z2 = 0;
+%         x = [x1 x2];
+%         y = [y1 y2];
+%         z = [z1 z2];
+%         col = [rp(ip) rp(ip)];
+%         surface([x;x],[y;y],[z;z],[col;col],... 
+%                 'facecol','no',... 
+%                 'edgecol','interp',...
+%                 'linew',d(ip)/dmax*dplot);
+%         if (nn<20) 
+%             plot(xtotal(:,1), xtotal(:,2),'ko','MarkerSize',10,'MarkerFaceColor', 'k')
+%         end
+%     end
+%     hcb = colorbar;
+%     title(hcb,'r(m)');
+%     hcb.Label.String = 'Thermal drawdown radius, r'; % Glitch happens due to this line
+%     view(2);
     
 switch igeom 
     case (1 | 101 | 102)
