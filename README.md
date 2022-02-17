@@ -1,5 +1,7 @@
 # mineheat
 
+To run the code, run the mine_geothermal.m file
+
 Update 20210723 JvH:
 - added new r0 calculation in pipeheat.m
 - this slightly changes all T calculations, so ran new set of benchmark testbanks results
