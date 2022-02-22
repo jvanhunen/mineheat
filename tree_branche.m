@@ -4,7 +4,7 @@ function [n_tree_idx, n_tree, np] = tree_branche(cnode, n_tree_idx, n_tree, np, 
     % reduce the heat computation by avoiding for loops in mineheat.m. It
     % could also be used to establish the mine network's connectivity by
     % checking which nodes are not in the tree using the n_tree_idx.
-    verbose = 1;
+    verbose = 0;
 
     % Prints out VTK files to highlight the tree formation every time 5
     % nodes are added to it
