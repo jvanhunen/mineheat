@@ -34,7 +34,7 @@ verbose = 0;
 %%% setting values to variables in the PRE-PROCESSING section
 
 % Geometry used for calculation (not used if testbank!=0):
-igeom = 11; %'UserDefinedGeometry-CommandLinePrompts'; 
+igeom = 8;%'UserDefinedGeometry-CommandLinePrompts';
 alltests = igeom; 
 
 % Testbank
@@ -50,9 +50,11 @@ physical_propertiesFlag = 2;       %%% 0 - User specified + command prompt
                             
                                  
 % Generate output type
-figureFlag = 1;       %%% 0 - Print summary results file
+figureFlag = 2;       %%% 0 - Print summary results file
                       %%% 1 - Plot maps
-                      %%% 2 - Print summary results files and
+                      %%% 2 - VTK Output file - TODO: allow for multi
+                      %%% timesteps
+                      %%% 3 - Print summary results files and
                       %%%     plot maps  - TODO
 
 savePrompt = 1;       %%% 0 - Prints summary results to command line, but does not generate text file or prompt
@@ -222,16 +224,19 @@ for irun = 1:ntests
     disp('-------')
      
     % Calculate pipe lengths, initialise pipe diameters as a vector
+    global xtotal;
     [pipe_nodes, xtotal, L, d] = mine_array_setup('1', np, A12, A10, xo, x, d_set);
        
-
     % Calculate flow through pipe system:
     disp('Running: mineflow.m - calculating hydraulic heads and pipe flow volumes')
     [H Q]  = mineflow(nn, no, np, x, xo, A12, A10, Ho, q, L, d);
     disp('Call complete: geometry generation sucessful, flow model variable initialised')
     disp('-------')
 
-    
+    % Calculate Re through the system:
+    rho_w = 1000.; % water density (kg/m3)
+    mu_w = 8.90*10^-4; % Water dynamic viscosity (kg m^-1 s^-1)
+    Re = rho_w * abs(Q) / (pi*(d/2).^2) * L /mu_w; %Reynolds number for each pipe
     
 
     %%% Setup pipe flow arrays:
@@ -245,7 +250,7 @@ for irun = 1:ntests
 
     %   Current script for mine_heat - contains fixes for known bugs
     [Tn Tp rp]= mine_heat(nyrs, d, L, Q, v, np, nn, no, Tf_ini, k_r, Cp_r, rho_r,...
-        Tr, npipes, node_pipes_in, node_pipes_out, pipe_nodes,xtotal,PhysicalProperties,testbank,x,xo, n_tree, id_tree);
+        Tr, npipes, node_pipes_in, node_pipes_out, pipe_nodes,xtotal,PhysicalProperties,testbank,x,xo, n_tree);
 
     disp('Call complete: thermal calculation sucessful')
     disp('-------')
@@ -296,12 +301,27 @@ switch figureFlag
         
         % plot results:
         if testbank == 0 && paramsenstest == 0 % only plot results when not performing testbank tasks:
-            %     disp('Plotting... Please wait');
+                %disp('Plotting... Please wait');
             disp('Running: mineplots.m - plotting outputs')
             tic
-            mine_plots (igeom, xo, x, d, np, nn, pipe_nodes, Tp, Tn, Q, H, Ho, Tr, Tf_ini, q, inferno, rp)
+            mine_plots (igeom, xo, x, d, np, nn, pipe_nodes, Tp, Tn, Q, H, Ho, Tr, Tf_ini, q, inferno, rp, Re)
             toc
         end
+
+    case 2 % Generate VTK file compatible with ParaVIEW
+%         if ~isstring(igeom)
+%             if isfloat(igeom)
+%                 vtkf = sprintf("igeom_%f", igeom);
+%             else
+%                 vtkf = sprintf("igeom_%d", igeom);
+%             end
+%         elseif length(igeom) > 20
+%             vtkf = 'outpout';
+%         else
+%             vtkf = igeom;
+%         end
+        vtkf = "output_vtk";
+        vtk_factory(vtkf, 1, 1, pipe_nodes, xtotal, {Tn, [Ho; H], npipes}, ["T(C)", "Head(m)","Nconnections"], {Q, Re, rp, Tp.'}, ["Q(m3/s)","Re(-)","Radius(m)","Pipe_Temperatures(C)"]);
 end
 
 if(paramsenstest ~=0)

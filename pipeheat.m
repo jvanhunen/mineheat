@@ -2,10 +2,7 @@ function [Tout, r0] = pipeheat (r, l, Tin, k_r, Cp_r, rho_r, Tr, v, t,PhysicalPr
 % Calculates temperature change in pipe segment due to 
 % heat exchange with pipe wall
 % method from (Rodriguez & Diaz, 2009)
-% JMC updated it to subsegment the pipe in small intervals
 
-il = 1; % pipe segment interval length
-il = min(il,l); % ensures il isn't longer than the pipe itself
 verbose = 0;
 
 if (testbank == 1 || testbank == 1)
@@ -58,17 +55,21 @@ if verbose
    fprintf(' pipeheat: t=%f, r0=%f\n',t,r0)
 end
 
+% If the fluid velocity is very very slow, then the following computation
+% exceeds the rock temperature. So we set the Tout to rock temp and exit
+% function here. (we don't do it before as we want r0 to compute.)
+if VF < 1e-13
+    Tout = Tr;
+    return;
+end
+
 % effective heat transfer coeff for fluid + wall:
 U = (1/h_f + r/k_r*log(r0/r))^-1;
-
-for i = 1:l/il
-    % Outflow T using eqn 4 in Rodriguez & Diaz (2009):
-    coef1 = 2*pi*r*il*U*Tr;
-    coef2 = rho_f*Cp_f*VF;
-    coef3 = pi*r*il*U;
-    Tout = (coef1 + (coef2-coef3)*Tin) / (coef2+coef3);
-    Tin = Tout;
-end
+% Outflow T using eqn 4 in Rodriguez & Diaz (2009):
+coef1 = 2*pi*r*l*U*Tr;
+coef2 = rho_f*Cp_f*VF;
+coef3 = pi*r*l*U;
+Tout = (coef1 + (coef2-coef3)*Tin) / (coef2+coef3);
 
 if verbose
     L = log (r0/r);

@@ -172,6 +172,23 @@ switch callCase
                 end
             end
         end
+
+        % JMC BUILDING NODE TREE FOR HEAT COMPUTATION
+        % Array to keep track of node index in tree
+        n_tree_idx = zeros(nn+no,1);
+        % Array representing the flow-tree in which to solve for Temp
+        n_tree = zeros(nn+no,1); % note that the end of the tree might
+        % be 0 padded if not all the nodes are connected to the mine
+        % network.
+        np = 1; % the current node tree position free to add a new node
+        for inode = 1:nn+no
+            if npipes(1,inode) == 0 && npipes(2,inode) > 0 && inode ~=50 % external inflow into (free-pressure) node
+                % will create the tree branche starting from cnode   
+                % we pass -1 as the previous pipe argument as there are none
+                % fprintf("Starting node: %d\n",inode);
+                [n_tree_idx, n_tree, np] = tree_branche(inode, n_tree_idx, n_tree, np, node_pipes_out, node_pipes_in, npipes, pipe_nodes, Q); 
+            end
+        end
         
         % Some nodes have external inflow, which needs recording too:
         for inode = 1:nn
@@ -194,28 +211,7 @@ switch callCase
                 end
             end
         end    
-            %%%%
 
-        % JMC TREE SORTING FOR HEAT COMPUTATION
-        % Array to store how many attempts at adding the node to the
-        % tree have occured
-        n_in_tree = zeros(nn+no,1);
-        % Array to keep track of node index in tree
-        n_tree_idx = zeros(nn+no,1);
-        % Array representing the flow-tree in which to solve for Temp
-        n_tree = zeros(nn+no,1); % note that the end of the tree might
-        % be 0 padded if not all the nodes are connected to the mine
-        % network.
-
-        np = 1; % the current node tree position free to add a new node
-
-        for inode = 1:nn+no
-            if npipes(1,inode) == 0 && npipes(2,inode) > 0  % external inflow into (free-pressure) node
-                % will create the tree branche starting from cnode   
-                % we pass -1 as the previous pipe argument as there are none
-                [n_in_tree, n_tree_idx, n_tree, np, go_to_next] = tree_branche(inode, n_in_tree, n_tree_idx, n_tree, np, node_pipes_out, npipes, pipe_nodes); 
-            end
-        end
             
         %%%%%%%%%%%%%%%%%%%%%%%%%
         %%% Assign varargout %%%%

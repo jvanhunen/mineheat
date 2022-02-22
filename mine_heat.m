@@ -1,6 +1,6 @@
 function [Tn Tp rp] = mine_heat(nyrs, d, L, Q, v, np, nn, no, Tf_ini,...
         k_r, Cp_r, rho_r, Tr, npipes, node_pipes_in, node_pipes_out, pipe_nodes,...
-        xtotal,PhysicalProperties,testbank, x, xo, n_tree, n_tree_idx) 
+        xtotal,PhysicalProperties,testbank, x, xo, n_tree) 
     %        k_r    = thermal conductivity     [
     %        Cp_r   = heat capacity            [
     %        rho_r  = density                  [kg m^-3]
@@ -21,8 +21,6 @@ function [Tn Tp rp] = mine_heat(nyrs, d, L, Q, v, np, nn, no, Tf_ini,...
     %        pipe_nodes  = (np,2) array to store start & end node of each pipe
     %        n_tree = (nn+no,1) array to store all connected nodes based on
     %        downstream flow.
-    %        n_tree_idx = (nn+no,1) maps the node to its index in the
-    %        n_tree array. Useful to check if a node is in the flow path.
     %        
     % version 20220217
     %    JMC replaced heat computation using downstream tree.
@@ -84,13 +82,13 @@ function [Tn Tp rp] = mine_heat(nyrs, d, L, Q, v, np, nn, no, Tf_ini,...
     end
     
     % Solves for the system temperature using the n_tree which ensures
-    % that when every node is solved all the required inflow Temps have already
-    % been calculated.    
+    % that when every node is solved all the required significant inflow Temps have already
+    % been calculated or are known boundaries.    
     for i = 1:length(n_tree)
         in = n_tree(i);
         
-        % checks if end of tree reached
-        if n_tree(in) == 0
+        % checks if end of tree reached        
+        if in == 0
             break;
         end
 

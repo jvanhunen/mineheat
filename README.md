@@ -2,10 +2,13 @@
 
 To run the code, run the mine_geothermal.m file
 
-Update 20220217 JMC:
-- compute heat along pipe iteratively
-- revised heat algo from nested for loops to search tree connecting flowing pipes
-- ploting heat as node temperatures rather than pipe temperatures
+Update 20220222 JMC:
+- added slow velocity check (VF) in heatpipe.m to avoid max(T) > rock temperature.
+- revised heat algo from nested for loops to search tree connecting flowing pipes.
+- ploting heat as node temperatures rather than pipe temperatures.
+- JvH: Added plotting of flow direction.
+- Added Reynold's number computation and plotting.
+- Added the vtk_factory.m to generate VTK file outputs readable in ParaVIEW.
 
 Update 20210723 JvH:
 - added new r0 calculation in pipeheat.m

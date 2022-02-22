@@ -1,4 +1,4 @@
-function Tout = mine_plots (igeom, xo, x, d, np, nn, pipe_nodes, Tp, Tn, Q, H, Ho, Tr, Tf, q, colourBar, rp)
+function Tout = mine_plots (igeom, xo, x, d, np, nn, pipe_nodes, Tp, Tn, Q, H, Ho, Tr, Tf, q, colourBar, rp, Re)
 % 
 % This routine plots temperature T, flow Q and fluid pressure (hydraulic
 % head ) H distributions across the mine network.
@@ -286,31 +286,54 @@ figure(2), clf
     %caxis([minQ-eps maxQ+eps]);
     caxis([maxQ*1e-3 maxQ+eps]);
     set(gca,'ColorScale','log')
+    if (nn<20) 
+        plot(xtotal(:,1), xtotal(:,2),'ko','MarkerSize',10,'MarkerFaceColor', 'k')
+    end
+    x1 = xtotal(pipe_nodes(:,1),1);
+    x2 = xtotal(pipe_nodes(:,2),1);
+    y1 = xtotal(pipe_nodes(:,1),2);
+    y2 = xtotal(pipe_nodes(:,2),2);
+    dx2 = 0.5*(x2-x1); 
+    dy2 = 0.5*(y2-y1);
+    q2=quiver(x1(:),y1(:),dx2(:),dy2(:),0);
+    q2.ShowArrowHead='on';
+    q2.Color='black';
+    z1 = 0;
+    z2 = 0;
+    drel=d/dmax*dplot;
+%     for ip = 1:np
+%         x1 = xtotal(pipe_nodes(ip,1),1);
+%         x2 = xtotal(pipe_nodes(ip,2),1);
+%         y1 = xtotal(pipe_nodes(ip,1),2);
+%         y2 = xtotal(pipe_nodes(ip,2),2);
+%         z1 = 0;
+%         z2 = 0;
+%         x = [x1 x2];
+%         y = [y1 y2];
+%         z = [z1 z2];
+%         col = [Q(ip) Q(ip)];
+%         surface([x;x],[y;y],[z;z],[col;col],... 
+%                 'facecol','no',... 
+%                 'edgecol','interp',...
+%                 'linew',d(ip)/dmax*dplot);
+%         if (nn<20) 
+%             plot(xtotal(:,1), xtotal(:,2),'ko','MarkerSize',10,'MarkerFaceColor', 'k')
+%         end
     for ip = 1:np
-        x1 = xtotal(pipe_nodes(ip,1),1);
-        x2 = xtotal(pipe_nodes(ip,2),1);
-        y1 = xtotal(pipe_nodes(ip,1),2);
-        y2 = xtotal(pipe_nodes(ip,2),2);
-        z1 = 0;
-        z2 = 0;
-        x = [x1 x2];
-        y = [y1 y2];
+        x = [x1(ip) x2(ip)];
+        y = [y1(ip) y2(ip)];
         z = [z1 z2];
         col = [Q(ip) Q(ip)];
         surface([x;x],[y;y],[z;z],[col;col],... 
                 'facecol','no',... 
                 'edgecol','interp',...
-                'linew',d(ip)/dmax*dplot);
-        if (nn<20) 
-            plot(xtotal(:,1), xtotal(:,2),'ko','MarkerSize',10,'MarkerFaceColor', 'k')
-        end
+                'linew',drel(ip));
     end
     hcb = colorbar;
     title(hcb,'Q(m^3/sec)')
     hcb.Label.String = 'Volumetric Flow Rate, Q';
     view(2)
-    
-    
+    hold off
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%% Case 2 -  3D with z-separation provided
@@ -541,6 +564,49 @@ figure(3), clf
 %     title(hcb,'r(m)');
 %     hcb.Label.String = 'Thermal drawdown radius, r'; % Glitch happens due to this line
 %     view(2);
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%% FIGURE 6 - Reynolds Number %
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   
+figure(6), clf
+    axis equal
+    hold on 
+    grid on
+    colormap(colourBar)
+    minRe = min(Re);
+    maxRe = max(Re);
+    dRe = maxRe-minRe;
+    if (abs(dRe/maxRe)<0.01)
+        eps = abs(0.01*maxRe);
+    else
+        eps = 0;
+    end
+    %caxis([minQ-eps maxQ+eps]);
+    caxis([maxRe*1e-3 maxRe+eps]);
+    set(gca,'ColorScale','log')
+    for ip = 1:np
+        x1 = xtotal(pipe_nodes(ip,1),1);
+        x2 = xtotal(pipe_nodes(ip,2),1);
+        y1 = xtotal(pipe_nodes(ip,1),2);
+        y2 = xtotal(pipe_nodes(ip,2),2);
+        z1 = 0;
+        z2 = 0;
+        x = [x1 x2];
+        y = [y1 y2];
+        z = [z1 z2];
+        col = [Re(ip) Re(ip)];
+        surface([x;x],[y;y],[z;z],[col;col],... 
+                'facecol','no',... 
+                'edgecol','interp',...
+                'linew',d(ip)/dmax*dplot);
+        if (nn<20) 
+            plot(xtotal(:,1), xtotal(:,2),'ko','MarkerSize',10,'MarkerFaceColor', 'k')
+        end
+    end
+    hcb = colorbar;
+    title(hcb,'Reynold Number');
+    hcb.Label.String = 'Re';
+    view(2);
     
 switch igeom 
     case (1 | 101 | 102)
