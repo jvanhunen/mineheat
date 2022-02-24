@@ -34,7 +34,7 @@ verbose = 0;
 %%% setting values to variables in the PRE-PROCESSING section
 
 % Geometry used for calculation (not used if testbank!=0):
-igeom = 'UserDefinedGeometry-CommandLinePrompts';
+igeom = 104;%'UserDefinedGeometry-CommandLinePrompts';
 alltests = igeom; 
 
 % Testbank
@@ -50,7 +50,7 @@ physical_propertiesFlag = 2;       %%% 0 - User specified + command prompt
                             
                                  
 % Generate output type
-figureFlag = 1;       %%% 0 - Print summary results file
+figureFlag = 2;       %%% 0 - Print summary results file
                       %%% 1 - Plot maps
                       %%% 2 - VTK Output file - TODO: allow for multi
                       %%% timesteps

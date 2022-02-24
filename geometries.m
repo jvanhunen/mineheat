@@ -357,6 +357,36 @@ switch igeom
         end     
 
         idiagn = 148;  % not very useful, since there are 2 outlets, not 1.
+
+    case 104
+        % ArcGIS shapefile geometry
+        nconnect1 = 1240;
+        nconnect2 = 2260;
+        [nn, no, np, A12, A10, xo, x] = ArcGeometrySecondSeamZ(nconnect1,nconnect2);
+        
+        % Set fixed hydraulic heads 
+        Ho = zeros(no,1);
+        Ho(1) = 0;
+        
+        
+        n_flows = 1;
+        [q_in q_out] = testFlows(n_flows);
+%         q_in = q_in + 1;
+%         q_out = q_out+1;
+        % Check inflow/outflow locations fit in nodal space
+        if max([q_in{:}]) > nn || max([q_out{:}]) > nn
+            error('q_in and/or q_out locations are greater than nodal space of mine model. Choose different q_in and/or q_out.');
+        end
+        
+        qset = varargin{1};
+        
+        % Set external inflow/outflow for non-fixed nodes
+        q = zeros(nn,1);
+        for i = 1:length(q_in)
+            q(q_in{i}) = -qset;
+            q(q_out{i}) = qset;
+        end
+        idiagn = nn;
         
         
     case 'UserDefinedGeometry-CommandLinePrompts'
