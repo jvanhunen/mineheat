@@ -22,7 +22,6 @@ function [cnode, n_tree_idx, n_tree, tp, go_to_next] = tree_add(cnode, n_tree_id
     % the inflow to cnode
     count = 0;
     if npipes(1, cnode) > 0
-        sumQin = sum(Q(node_pipes_in(1:npipes(1,cnode),cnode)));
         incoming_pipes = node_pipes_in(1:npipes(1,cnode),cnode);
         for i = 1:length(incoming_pipes)
             p = incoming_pipes(i);
@@ -32,9 +31,9 @@ function [cnode, n_tree_idx, n_tree, tp, go_to_next] = tree_add(cnode, n_tree_id
             % starting point
             if n_tree_idx(n) > 0 || npipes(1,n) == 0
                 count = count + 1;
-            % or if its flow is negligeable (less than 0.000001%)
-            % compared to total inflow to the node
-            elseif sumQin > 0 && Q(p)/sumQin < 1e-10
+            % or if its flow is negligeable (less than 1e-10)
+            % compared to the maximum model flow
+            elseif Q(p)/max(Q) < 1e-10
                 %fprintf("N %d: n_tree_idx = %d, Q = %e, Qn/Qmax= %e\n", n, n_tree_idx(n), Q(p), Q(p)/sumQin*100);
                 count = count + 1;
             end

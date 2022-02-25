@@ -34,7 +34,7 @@ verbose = 0;
 %%% setting values to variables in the PRE-PROCESSING section
 
 % Geometry used for calculation (not used if testbank!=0):
-igeom = 8;%'UserDefinedGeometry-CommandLinePrompts';
+igeom = 104;%'UserDefinedGeometry-CommandLinePrompts';
 alltests = igeom; 
 
 % Testbank
@@ -320,8 +320,9 @@ switch figureFlag
 %         else
 %             vtkf = igeom;
 %         end
+        id_tree(id_tree > 0) = 1;
         vtkf = "output_vtk";
-        vtk_factory(vtkf, 1, 1, pipe_nodes, xtotal, {Tn, [Ho; H], npipes}, ["T(C)", "Head(m)","Nconnections"], {Q, Re, rp, Tp.'}, ["Q(m3/s)","Re(-)","Radius(m)","Pipe_Temperatures(C)"]);
+        vtk_factory(vtkf, 1, 1, pipe_nodes, xtotal, {Tn, [Ho; H], npipes, id_tree}, ["T(C)", "Head(m)","Nconnections","InTree"], {Q, Re, rp, Tp.'}, ["Q(m3/s)","Re(-)","Radius(m)","Pipe_Temperatures(C)"]);
 end
 
 if(paramsenstest ~=0)
