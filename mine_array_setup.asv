@@ -32,7 +32,7 @@ switch callCase
         pipe_nodes  = zeros(np,2);  % array to store start & end node of each pipe
         % note the 'global' node numbering, including
         %    fixed and free head nodes
-        A102 = [A10 A12];           % merges table of fixed (A10) and unknown (A12) nodes
+        A102 = [A12 A10];           % merges table of fixed (A10) and unknown (A12) nodes
         [row,col] = find(A102==-1); % node with -1 indicates one end point of pipe
         pipe_nodes(row,1) = col;    % store that node nr in pipe_nodes array
         [row,col] = find(A102==1);  % node with 1 indicates the other end point
@@ -44,7 +44,7 @@ switch callCase
             case 2
                 
                 L   = zeros(np,1);
-                xtotal = [xo;x];
+                xtotal = [x;xo];
                 p1 = pipe_nodes(:, 1);
                 p2 = pipe_nodes(:, 2);
                 x1 = xtotal(p1,:);
@@ -55,7 +55,7 @@ switch callCase
             case 3
                 
                 L = zeros(np,1);
-                xtotal = [xo;x];
+                xtotal = [x;xo];
                 p1 = pipe_nodes(:, 1);
                 p2 = pipe_nodes(:, 2);
                 x1 = xtotal(p1,:);
@@ -111,7 +111,7 @@ switch callCase
         end
         
         % Store nr of incoming and outgoing pipes for every node;
-        npipes = zeros(2,no+nn); % nr of incoming (first row) and outgoing (2nd row) pipes
+        npipes = zeros(2,nn+no); % nr of incoming (first row) and outgoing (2nd row) pipes
         for ipipe=1:np
             % pipe ipipe enters node inode:
             inode = pipe_nodes (ipipe,2);
@@ -186,7 +186,7 @@ switch callCase
                 % will create the tree branche starting from cnode   
                 % we pass -1 as the previous pipe argument as there are none
                 % fprintf("Starting node: %d\n",inode);
-                [n_tree_idx, n_tree, np, go_to_next] = tree_branche(inode, n_tree_idx, n_tree, np, node_pipes_out, node_pipes_in, npipes, pipe_nodes, Q); 
+                [n_tree_idx, n_tree, np] = tree_branche(inode, n_tree_idx, n_tree, np, node_pipes_out, node_pipes_in, npipes, pipe_nodes, Q); 
             end
         end
         

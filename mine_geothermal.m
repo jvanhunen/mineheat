@@ -34,7 +34,7 @@ verbose = 0;
 %%% setting values to variables in the PRE-PROCESSING section
 
 % Geometry used for calculation (not used if testbank!=0):
-igeom = 104;%'UserDefinedGeometry-CommandLinePrompts';
+igeom = 11;%'UserDefinedGeometry-CommandLinePrompts';
 alltests = igeom; 
 
 % Testbank
@@ -50,7 +50,7 @@ physical_propertiesFlag = 2;       %%% 0 - User specified + command prompt
                             
                                  
 % Generate output type
-figureFlag = 2;       %%% 0 - Print summary results file
+figureFlag = 1;       %%% 0 - Print summary results file
                       %%% 1 - Plot maps
                       %%% 2 - VTK Output file - TODO: allow for multi
                       %%% timesteps
@@ -245,7 +245,7 @@ for irun = 1:ntests
 
     %%% Calculate temperature of pipe system:
     % Initial rock temperature (in degC):   
-    Tin    = Tf_ini*ones(np,1);    %%% Is this correct - you are using water temperature?
+    % Tin    = Tf_ini*ones(np,1);    %%% Is this correct - you are using water temperature?
     disp('Running: mine_heat.m - calculating nodal and pipe temperatures')
 
     %   Current script for mine_heat - contains fixes for known bugs
@@ -322,7 +322,7 @@ switch figureFlag
 %         end
         id_tree(id_tree > 0) = 1;
         vtkf = "output_vtk";
-        vtk_factory(vtkf, 1, 1, pipe_nodes, xtotal, {Tn, [Ho; H], npipes, id_tree}, ["T(C)", "Head(m)","Nconnections","InTree"], {Q, Re, rp, Tp.'}, ["Q(m3/s)","Re(-)","Radius(m)","Pipe_Temperatures(C)"]);
+        vtk_factory(vtkf, 1, 1, pipe_nodes, xtotal, {Tn, [H; Ho], npipes, id_tree}, ["T(C)", "Head(m)","Nconnections","InTree"], {Q, Re, rp, Tp.'}, ["Q(m3/s)","Re(-)","Radius(m)","Pipe_Temperatures(C)"]);
 end
 
 if(paramsenstest ~=0)

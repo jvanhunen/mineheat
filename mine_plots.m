@@ -17,7 +17,7 @@ dplot = 2;   % Thickness of pipe segments in plot
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-xtotal = [xo; x];
+xtotal = [x; xo];
 dmax = max(d);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%% Case 1 - if only 2D, or if 3D with no z-separation provided
