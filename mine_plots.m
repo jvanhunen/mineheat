@@ -7,8 +7,8 @@ function Tout = mine_plots (igeom, xo, x, d, np, nn, pipe_nodes, Tp, Tn, Q, H, H
 % Version 20210630 Jeroen van Hunen
 
 %%% Retrieve inflow and outflow nodes
-qin_node = find(q<0)+1;         % 
-qout_node = find(q>0)+1;
+qin_node = find(q<0);         % 
+qout_node = find(q>0);
 
 dplot = 2;   % Thickness of pipe segments in plot    
 
@@ -17,7 +17,7 @@ dplot = 2;   % Thickness of pipe segments in plot
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-xtotal = [xo; x];
+xtotal = [x; xo];
 dmax = max(d);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%% Case 1 - if only 2D, or if 3D with no z-separation provided

@@ -32,7 +32,7 @@ switch callCase
         pipe_nodes  = zeros(np,2);  % array to store start & end node of each pipe
         % note the 'global' node numbering, including
         %    fixed and free head nodes
-        A102 = [A10 A12];           % merges table of fixed (A10) and unknown (A12) nodes
+        A102 = [A12 A10];           % merges table of fixed (A10) and unknown (A12) nodes
         [row,col] = find(A102==-1); % node with -1 indicates one end point of pipe
         pipe_nodes(row,1) = col;    % store that node nr in pipe_nodes array
         [row,col] = find(A102==1);  % node with 1 indicates the other end point
@@ -44,7 +44,7 @@ switch callCase
             case 2
                 
                 L   = zeros(np,1);
-                xtotal = [xo;x];
+                xtotal = [x;xo];
                 p1 = pipe_nodes(:, 1);
                 p2 = pipe_nodes(:, 2);
                 x1 = xtotal(p1,:);
@@ -55,7 +55,7 @@ switch callCase
             case 3
                 
                 L = zeros(np,1);
-                xtotal = [xo;x];
+                xtotal = [x;xo];
                 p1 = pipe_nodes(:, 1);
                 p2 = pipe_nodes(:, 2);
                 x1 = xtotal(p1,:);
@@ -111,7 +111,7 @@ switch callCase
         end
         
         % Store nr of incoming and outgoing pipes for every node;
-        npipes = zeros(2,no+nn); % nr of incoming (first row) and outgoing (2nd row) pipes
+        npipes = zeros(2,nn+no); % nr of incoming (first row) and outgoing (2nd row) pipes
         for ipipe=1:np
             % pipe ipipe enters node inode:
             inode = pipe_nodes (ipipe,2);
@@ -182,7 +182,7 @@ switch callCase
         % network.
         np = 1; % the current node tree position free to add a new node
         for inode = 1:nn+no
-            if npipes(1,inode) == 0 && npipes(2,inode) > 0 && inode ~=50 % external inflow into (free-pressure) node
+            if npipes(1,inode) == 0 && npipes(2,inode) > 0% external inflow into (free-pressure) node
                 % will create the tree branche starting from cnode   
                 % we pass -1 as the previous pipe argument as there are none
                 % fprintf("Starting node: %d\n",inode);
@@ -191,7 +191,7 @@ switch callCase
         end
         
         % Some nodes have external inflow, which needs recording too:
-        for inode = 1:nn
+        for inode = 1:(nn)
             if q(inode)<0    % external inflow into (free-pressure) node
                 % add this info to the node_pipes_in array
                 external_inflow_reported = 0;
