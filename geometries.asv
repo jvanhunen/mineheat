@@ -407,7 +407,7 @@ switch igeom
         GIStoMatlab.setUpIndicesMaps(nn,no);
         
         % Set fixed hydraulic heads 
-        GIS_ho = 3000;
+        GIS_ho = 1000;
         GIStoMatlab.indicesNNNO("set", GIS_ho, nn+no); % sets the GIS node 1000 to the fixed head node
         Ho = zeros(no,1);
         Ho(1) = 0;
@@ -417,9 +417,7 @@ switch igeom
         A10 = A12(:, GIS_ho);
         A12(:, GIS_ho) = temp;
         temp = xo;
-        xo = x(GIS_ho,:);
-        x(GIS_ho, :) = temp;
-
+        xo =
 
         n_flows = 1;
         [q_in q_out] = testFlows(n_flows);

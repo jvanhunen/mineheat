@@ -322,7 +322,6 @@ switch figureFlag
 %         end
         id_tree(id_tree > 0) = 1;
         vtkf = "output_vtk";
-
         temp = Tn;
         Tn(3000) = Tn(GIStoMatlab.indicesNNNO("get",3000));
         Tn(GIStoMatlab.indicesNNNO("get",3000)) = temp(3000);
@@ -330,20 +329,29 @@ switch figureFlag
         H(3000) = Ho;
         Ho = temp(3000);
         id_tree(3000) = 2;
-
-       % Adjust A12, xo, x and A10
-        GIS_ho = 3000;
-        temp = A10;
-        A10 = A12(:, GIS_ho);
-        A12(:, GIS_ho) = temp;
-        temp = xo;
-        xo = x(GIS_ho,:);
-        x(GIS_ho, :) = temp;
-
-        [pipe_nodes, xtotal, L, d] = mine_array_setup('1', np, A12, A10, xo, x, d_set);
-
-        % Make sure Names have no spaces in them!!
-        vtk_factory(vtkf, 1, 1, pipe_nodes, xtotal, {Tn, [H; Ho], npipes, id_tree, [1:nn+no]}, ["T(C)", "Head(m)","Nconnections","InTree","GIS_ID"], {Q, Re, rp, Tp.',[1:np]}, ["Q(m3/s)","Re(-)","Radius(m)","Pipe_Temperatures(C)","Pipe_ID"]);
+        temp = x;
+        x(3000,:) = xo;
+        xo = temp(3000,:);
+        xtotal = [x;xo];
+        temp = pipe_nodes;
+        % reassign all exiting pipes
+        for ip = 1:npipes(2,3000)
+            pouts = node_pipes_out(:,3000);
+            pipe_nodes(pouts(ip),2) = GIStoMatlab.indicesNNNO("get",3000);
+        end
+        for ip = 1:npipes(1,3000)
+            ps = node_pipes_in(:,3000);
+            pipe_nodes(ps(ip),1) = GIStoMatlab.indicesNNNO("get",3000);
+        end
+        for ip = 1:npipes(2,GIStoMatlab.indicesNNNO("get",3000))
+            pouts = node_pipes_out(:,GIStoMatlab.indicesNNNO("get",3000));
+            pipe_nodes(pouts(ip),2) = GIStoMatlab.indicesNNNO("get",3000);
+        end
+        for ip = 1:npipes(1,GIStoMatlab.indicesNNNO("get",3000))
+            ps = node_pipes_in(:,3000);
+            pipe_nodes(ps(ip),1) = GIStoMatlab.indicesNNNO("get",3000);
+        end
+        vtk_factory(vtkf, 1, 1, pipe_nodes, xtotal, {Tn, [H; Ho], npipes, id_tree, [1:nn+no]}, ["T(C)", "Head(m)","Nconnections","InTree","GIS_ID"], {Q, Re, rp, Tp.'}, ["Q(m3/s)","Re(-)","Radius(m)","Pipe_Temperatures(C)"]);
 end
 
 if(paramsenstest ~=0)
