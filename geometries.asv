@@ -401,23 +401,26 @@ switch igeom
         % ArcGIS shapefile geometry
         nconnect1 = 1240;
         nconnect2 = 2260;
-        [nn, no, np, A12, A10, xo, x] = ArcGeometrySecondSeamZ(nconnect1,nconnect2);
+        [A120, xtotal, N] = GISCONVArcGeometrySecondSeamZ(nconnect1,nconnect2);
+
+        % Specify the number of desired fixed heads
+        no = 1;
+        nn = N - no;
 
         % creates a map between GIS indices and Matlab code indices
-        GIStoMatlab.setUpIndicesMaps(nn,no);
-        
+        GIStoMatlab.Init(nn,no);
+               
         % Set fixed hydraulic heads 
-        GIS_ho = 1000;
-        GIStoMatlab.indicesNNNO("set", GIS_ho, nn+no); % sets the GIS node 1000 to the fixed head node
+        GIS_ho = 3000;
+        GIStoMatlab.nodes("set", GIS_ho, nn+no); % sets the GIS node 1000 to the fixed head node
         Ho = zeros(no,1);
         Ho(1) = 0;
 
+        GIStoMatlab
+
         % Adjust A12, xo, x and A10
-        temp = A10;
-        A10 = A12(:, GIS_ho);
-        A12(:, GIS_ho) = temp;
-        temp = xo;
-        xo =
+        [A12, A10] = GIStoMatlab.MatSetup(A120);
+        [x, xo] = GIStoMatlab.MatSetup(xtotal, 'inv');
 
         n_flows = 1;
         [q_in q_out] = testFlows(n_flows);

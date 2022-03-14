@@ -323,24 +323,17 @@ switch figureFlag
         id_tree(id_tree > 0) = 1;
         vtkf = "output_vtk";
 
-        temp = Tn;
-        Tn(3000) = Tn(GIStoMatlab.indicesNNNO("get",3000));
-        Tn(GIStoMatlab.indicesNNNO("get",3000)) = temp(3000);
-        temp = H;
-        H(3000) = Ho;
-        Ho = temp(3000);
-        id_tree(3000) = 2;
+        % formatting new data to the GIS indices
+        [Tn,To] = internalState.MatToGIS(Tn(1:nn), Tn(nn+1:end), 'inv');
+        Tn = [Tn; To];
+        [H,Ho] = internalState.MatToGIS(H, Ho, 'inv');
 
        % Adjust A12, xo, x and A10
-        GIS_ho = 3000;
-        temp = A10;
-        A10 = A12(:, GIS_ho);
-        A12(:, GIS_ho) = temp;
-        temp = xo;
-        xo = x(GIS_ho,:);
-        x(GIS_ho, :) = temp;
-
-        [pipe_nodes, xtotal, L, d] = mine_array_setup('1', np, A12, A10, xo, x, d_set);
+        [A12, A10] = internalState.MatToGIS(A12, A10);
+        [x, xo] = internalState.MatToGIS(x, xo, 'inv');
+        
+        % reshape the geometrical relations to GIS indices
+        [pipe_nodes, xtotal, L, d] = mine_array_setup('1', np, A12.', A10.', xo, x, d_set);
 
         % Make sure Names have no spaces in them!!
         vtk_factory(vtkf, 1, 1, pipe_nodes, xtotal, {Tn, [H; Ho], npipes, id_tree, [1:nn+no]}, ["T(C)", "Head(m)","Nconnections","InTree","GIS_ID"], {Q, Re, rp, Tp.',[1:np]}, ["Q(m3/s)","Re(-)","Radius(m)","Pipe_Temperatures(C)","Pipe_ID"]);

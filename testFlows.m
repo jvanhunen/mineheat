@@ -32,7 +32,7 @@ function [q_in, q_out] = testFlows(n_flows)
                 q_out{4} = 35;
             case 5
                 q_in{1} = 50;
-                q_in{1} = 1500;
+                q_out{1} = 1500;
         end
 
 end
