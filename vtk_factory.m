@@ -1,5 +1,8 @@
 % A function which is used to generate VTK output files compatible with
 % Paraview.
+% Is able to handle both Point and Element data for 2D elements (i.e. pipe)
+% Can handle scalars and vector fields.
+% Currentl all data is converted into a double.
 % Julien Mouli-Castillo 
 % v20222202 - initial version
 function vtk_factory(filename, timestep, time, pipe_nodes, xtotal, n_data, n_dat_names, e_data, e_dat_names)
@@ -116,7 +119,7 @@ function vtk_factory(filename, timestep, time, pipe_nodes, xtotal, n_data, n_dat
                 end
     
                 vals = cell2mat(data(d));
-                vals(vals <= 1e-15) = 0;                
+                %vals(vals <= 1e-15) = 0;                
                 for v = 1:length(vals)      
                     if type == 1
                         fprintf(fid, "%.12e\n", vals(v));

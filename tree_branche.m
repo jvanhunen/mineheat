@@ -1,7 +1,7 @@
 function [n_tree_idx, n_tree, np] = tree_branche(cnode, n_tree_idx, n_tree, np, node_pipes_out, node_pipes_in, npipes, pipe_nodes, Q)
     % This is a recursive function which creates a tree by connecting the
     % nodes that are connected together by flowing pipes. It allows to
-    % reduce the heat computation by avoiding for loops in mineheat.m. It
+    % reduce the heat computation by avoiding nested for loops in mineheat.m. It
     % could also be used to establish the mine network's connectivity by
     % checking which nodes are not in the tree using the n_tree_idx.
     verbose = 0;

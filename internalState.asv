@@ -126,7 +126,7 @@ classdef internalState
            end
        end
 
-      % Method who reverts the swaps back to the GIS coordinates.
+      
       function [M12, M10] = MatToGIS(M12, M10, varagin)       
            if nargin > 2
                 M12 = M12.';

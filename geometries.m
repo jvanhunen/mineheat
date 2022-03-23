@@ -25,9 +25,8 @@ function [nn, no, np, A12, A10, xo, x, Ho, q, idiagn] = geometries(igeom,varargi
 head   = 1e-7;     % hydraulic head loss through mine (m). e.g. 6.3e-12
                    %%% Where we apply it is arbitrary
 switch igeom
-    
     case 1
-        % linear pipesystem:
+        % Benchmark 1: linear pipesystem of open pipes:
         [nn, no, np, A12, A10, xo, x] = geometry1();
         % set fixed hydraulic heads:
         Ho     = zeros(no,1);
@@ -38,7 +37,7 @@ switch igeom
         idiagn = nn;
         
     case 2
-        % dual, parallel pipesystem:
+        % Benchmark 2: dual, parallel pipesystem of open pipes:
         [nn, no, np, A12, A10, xo, x] = geometry2();
         % set fixed hydraulic heads:
         Ho     = zeros(no,1);
@@ -49,7 +48,7 @@ switch igeom
         idiagn = nn;
         
     case 3
-        % partly dual, parallel pipesystem:
+        % Benchmark 3: partly dual, parallel pipesystem:
         [nn, no, np, A12, A10, xo, x] = geometry3();
         % set fixed hydraulic heads:
         Ho     = zeros(no,1);
@@ -60,7 +59,7 @@ switch igeom
         
         
     case 4
-        % small grid:
+        % Test 1: small grid:
         [nn, no, np, A12, A10, xo, x] = geometry4();
         % set fixed hydraulic heads:
         Ho     = zeros(no,1);
@@ -72,7 +71,7 @@ switch igeom
         
         
     case 5
-        % large grid (diss Marijn Huis):
+        % Test 2: large grid (diss Marijn Huis):
         n  = 31;   % grid width (number of nodes wide)
         m  = 11;   % grid height (number of nodes high)
         l1 = 100;  % length of horizontal pipes
@@ -423,6 +422,50 @@ switch igeom
         [q_in q_out] = testFlows(n_flows);
 %         q_in = q_in + 1;
 %         q_out = q_out+1;
+        % Check inflow/outflow locations fit in nodal space
+        if max([q_in{:}]) > nn || max([q_out{:}]) > nn
+            error('q_in and/or q_out locations are greater than nodal space of mine model. Choose different q_in and/or q_out.');
+        end
+        
+        qset = varargin{1};
+        
+        % Set external inflow/outflow for non-fixed nodes
+        q = zeros(nn,1);
+        for i = 1:length(q_in)
+            q(q_in{i}) = -qset;
+            q(q_out{i}) = qset;
+        end
+        idiagn = nn;
+
+    case 201
+        % Test 2: large grid (diss Marijn Huis):
+        n  = 50;   % grid width (number of nodes wide)
+        m  = 50;   % grid height (number of nodes high)
+        s  = 3;   % number of seams
+        l1 = 100;  % length of horizontal pipes
+        l2 = 100;  % length of vertical pipes
+        h  = 100;   % interval between seams
+        cnx = [10 n*m+5; n*m*2-5 n*m*2+5];% list of connexions between seams
+        [A120, xtotal, N, np] = geometry_multigrid(n , m, s, l1, l2, h, cnx);
+        
+        % Specify the number of desired fixed heads
+        no = 1;
+        nn = N - no;
+        
+        % creates a map between GIS indices and Matlab code indices
+        internalState.Init(nn,no);
+               
+        % Set fixed hydraulic heads 
+        Ho = zeros(no,1); % creats the internal array of fixed head of size no
+        Ho = internalState.SetAsFixedHead(25, 0, Ho); % sets the GIS node 3 to the internal fixed head node, with a value of 0 m
+
+
+        % Adjust A12, xo, x and A10
+        [A12, A10] = internalState.MatSetup(A120);
+        [x, xo] = internalState.MatSetup(xtotal, 'inv');
+
+        n_flows = 6;
+        [q_in q_out] = testFlows(n_flows);
         % Check inflow/outflow locations fit in nodal space
         if max([q_in{:}]) > nn || max([q_out{:}]) > nn
             error('q_in and/or q_out locations are greater than nodal space of mine model. Choose different q_in and/or q_out.');

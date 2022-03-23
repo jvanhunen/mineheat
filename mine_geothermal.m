@@ -34,7 +34,7 @@ verbose = 0;
 %%% setting values to variables in the PRE-PROCESSING section
 
 % Geometry used for calculation (not used if testbank!=0):
-igeom = 200;%'UserDefinedGeometry-CommandLinePrompts';
+igeom = 201;%'UserDefinedGeometry-CommandLinePrompts';
 alltests = igeom; 
 
 % Testbank
@@ -323,20 +323,8 @@ switch figureFlag
         id_tree(id_tree > 0) = 1;
         vtkf = "output_vtk";
 
-        % formatting new data to the GIS indices
-        [Tn,To] = internalState.MatToGIS(Tn(1:nn), Tn(nn+1:end), 'inv');
-        Tn = [Tn; To];
-        [H,Ho] = internalState.MatToGIS(H, Ho, 'inv');
-
-       % Adjust A12, xo, x and A10
-        [A12, A10] = internalState.MatToGIS(A12, A10);
-        [x, xo] = internalState.MatToGIS(x, xo, 'inv');
-        
-        % reshape the geometrical relations to GIS indices
-        [pipe_nodes, xtotal, L, d] = mine_array_setup('1', np, A12.', A10.', xo, x, d_set);
-
         % Make sure Names have no spaces in them!!
-        vtk_factory(vtkf, 1, 1, pipe_nodes, xtotal, {Tn, [H; Ho], npipes, id_tree, [1:nn+no]}, ["T(C)", "Head(m)","Nconnections","InTree","GIS_ID"], {Q, Re, rp, Tp.',[1:np]}, ["Q(m3/s)","Re(-)","Radius(m)","Pipe_Temperatures(C)","Pipe_ID"]);
+        vtk_factory(vtkf, 1, 1, pipe_nodes, xtotal, {Tn, [H; Ho], npipes, id_tree, internalState.nodes, [q;0]}, ["T(C)", "Head(m)","Nconnections","InTree","GIS_ID","q(m3/s)"], {Q, Re, rp, Tp.',[1:np]}, ["Q(m3/s)","Re(-)","Radius(m)","Pipe_Temperatures(C)","Pipe_ID"]);
 end
 
 if(paramsenstest ~=0)

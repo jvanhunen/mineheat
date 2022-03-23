@@ -1,6 +1,6 @@
  function [H Q] = mineflow(nn, no, np, x, xo, A12, A10, Ho, q, L, d)
 % 
-% This routine solves for the flow in the pipes. The method follows the
+% This routine solves for the flow in the pipes. The method follows the Todi
 % EPANET manual (Appendix D and p.30/Table 3.1), which follows (Todini&Paliti, 1987)
 % The 'minor loss coefficient m in EPANET App D is assumed 0
 % 
