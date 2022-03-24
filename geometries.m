@@ -454,7 +454,7 @@ switch igeom
         idiagn = nn;
 
     case 201
-        % Test 2: large grid (diss Marijn Huis):
+        % Multi-seam model:
         n  = 50;   % grid width (number of nodes wide)
         m  = 50;   % grid height (number of nodes high)
         s  = 3;   % number of seams
