@@ -1,7 +1,27 @@
+%% This program allows for the computation of water and heat flow through a mine network
+%%     Copyright (C) 2022  Durham University
+% 
+%     This program is free software: you can redistribute it and/or modify
+%     it under the terms of the GNU General Public License as published by
+%     the Free Software Foundation, either version 3 of the License, or
+%     (at your option) any later version.
+% 
+%     This program is distributed in the hope that it will be useful,
+%     but WITHOUT ANY WARRANTY; without even the implied warranty of
+%     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%     GNU General Public License for more details.
+% 
+%     You should have received a copy of the GNU General Public License
+%     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+%%
+
 function [cnode, n_tree_idx, n_tree, tp, go_to_next] = tree_add(cnode, n_tree_idx, n_tree, tp, npipes, node_pipes_in, pipe_nodes, Q)
 % This functions adds the node to the tree if all the upstream nodes have
 % been added to the tree already or if the flow from an incoming pipe is so
-% negligeable that it can be ignored.
+% negligeable that it can be ignored. Starting nodes are not added to the
+% tree, as their temperature is known, but the go_to_next flag is set to true
+% to keep recursing from the starting node.
+%             cnode = the current node that is being considered
 %             % Array to keep track of node index in tree
 %             n_tree_idx = zeros(1,nn+no);
 %             % Array representing the flow-tree in which to solve for Temp
@@ -9,6 +29,8 @@ function [cnode, n_tree_idx, n_tree, tp, go_to_next] = tree_add(cnode, n_tree_id
 %             be 0 pgo_to_next if not all the nodes are connected to the mine
 %             network.
 %             % tp is the index of the tree's next vacant position
+%             go_to_next = 1 or 0, to determine whether to keep recursion
+%             going in branch_add.m
 
     verbose = 0;
     % Have we tried adding the node to the tree an amount of
@@ -34,7 +56,6 @@ function [cnode, n_tree_idx, n_tree, tp, go_to_next] = tree_add(cnode, n_tree_id
             % or if its flow is negligeable (less than 1e-10)
             % compared to the maximum model flow
             elseif Q(p)/max(Q) < 1e-10
-                %fprintf("N %d: n_tree_idx = %d, Q = %e, Qn/Qmax= %e\n", n, n_tree_idx(n), Q(p), Q(p)/sumQin*100);
                 count = count + 1;
             end
         end

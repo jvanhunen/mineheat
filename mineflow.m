@@ -1,6 +1,22 @@
- function [H Q] = mineflow(nn, no, np, x, xo, A12, A10, Ho, q, L, d)
+%% This program allows for the computation of water and heat flow through a mine network
+%%     Copyright (C) 2022  Durham University
 % 
-% This routine solves for the flow in the pipes. The method follows the
+%     This program is free software: you can redistribute it and/or modify
+%     it under the terms of the GNU General Public License as published by
+%     the Free Software Foundation, either version 3 of the License, or
+%     (at your option) any later version.
+% 
+%     This program is distributed in the hope that it will be useful,
+%     but WITHOUT ANY WARRANTY; without even the implied warranty of
+%     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%     GNU General Public License for more details.
+% 
+%     You should have received a copy of the GNU General Public License
+%     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+%%
+function [H Q] = mineflow(nn, no, np, x, xo, A12, A10, Ho, q, L, d)
+% 
+% This routine solves for the flow in the pipes. The method follows the Todi
 % EPANET manual (Appendix D and p.30/Table 3.1), which follows (Todini&Paliti, 1987)
 % The 'minor loss coefficient m in EPANET App D is assumed 0
 % 
@@ -101,5 +117,5 @@ while (sumdQrel>1e-8 && maxdQrel>1e-10) %original option was 1e-8
 %         error('Error in flow calculation. Stuck in infinite loop.');
 %     end
 end
-H=Hnew-min(Hnew);
+H=Hnew;%-min(Hnew);
  end

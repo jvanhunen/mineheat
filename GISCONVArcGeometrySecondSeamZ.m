@@ -14,10 +14,10 @@
 %     You should have received a copy of the GNU General Public License
 %     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 %%
-function [nn, no, np, A12, A10, xo, x] = ArcGeometrySecondSeamZ(seamFiles)  %,nconnect1,nconnect2
+function [A120, xtotal, N, np] = GISCONVArcGeometrySecondSeamZ(nconnect1,nconnect2)
 
-% T1 = shaperead('maps/BustyZ.shp');
-T1 = shaperead(seamFiles{1});
+%T1 = shaperead('maps/BustyZ.shp');
+T1 = shaperead('maps/HuttonFull.shp');
 sizeofT1 = size(T1);
 npoints1 = sizeofT1(1);
 flow_dir1 = zeros(npoints1,1);
@@ -36,15 +36,6 @@ for ipoint = 1:npoints1
     end
 end
 
-
-%%%%% Select node for connection point
-AskUser = msgbox('Select node number of connection point in seam one.');
-waitfor(AskUser)
-nconnect1 = inputdlg('Seam 1 connection node');
-nconnect1 = str2num(nconnect1{1});
-%%%%%
-
-
 ntemp1 = max_node_id1;
 
 max_pipe_id1 = 0;
@@ -55,11 +46,8 @@ for ipoint = 1:npoints1
 end
 np1 = max_pipe_id1;
 
-
-
-
-T2 = shaperead(seamFiles{2});
-% T2 = shaperead('maps/HuttonFull.shp');
+T2 = shaperead('maps/BustyZ.shp');
+%T2 = shaperead('maps/HuttonFull.shp');
 sizeofT2 = size(T2);
 npoints2 = sizeofT2(1);
 flow_dir2 = zeros(npoints2,1);
@@ -78,14 +66,6 @@ for ipoint = 1:npoints2
     end
 end
 
-%%%%% Select node for connection point
-AskUser = msgbox('Select node number of connection point in seam two.');
-waitfor(AskUser)
-
-nconnect2 = inputdlg('Seam 2 connection node');
-nconnect2 = str2num(nconnect2{1});
-%%%%%%%%%%%%%%
-
 ntemp2 = max_node_id2;
 
 max_pipe_id2 = 0;
@@ -100,8 +80,8 @@ np2 = max_pipe_id2;
 no  = 1;       % nr of fixed head nodes
 
 % Parameters to be solved in this function:
-np = np1+np2+1;
-ntemp = ntemp1+ntemp2;
+np = np1+np2+1
+ntemp = ntemp1+ntemp2
 Atemp = zeros(np,ntemp);
 %A11inv = zeros(np,np);
 xtemp   = zeros(ntemp,3);
@@ -143,4 +123,6 @@ A10 = sparse(Atemp(:,1));
 A12 = sparse(Atemp(:,2:end));
 xo = xtemp(1,:);
 x = xtemp(2:end,:);
-end
+A120 = [A12,A10];
+xtotal = [x; xo];
+N = ntemp;

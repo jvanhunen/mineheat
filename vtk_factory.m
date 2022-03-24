@@ -1,5 +1,25 @@
+%% This program allows for the computation of water and heat flow through a mine network
+%%     Copyright (C) 2022  Durham University
+% 
+%     This program is free software: you can redistribute it and/or modify
+%     it under the terms of the GNU General Public License as published by
+%     the Free Software Foundation, either version 3 of the License, or
+%     (at your option) any later version.
+% 
+%     This program is distributed in the hope that it will be useful,
+%     but WITHOUT ANY WARRANTY; without even the implied warranty of
+%     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%     GNU General Public License for more details.
+% 
+%     You should have received a copy of the GNU General Public License
+%     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+%%
+
 % A function which is used to generate VTK output files compatible with
 % Paraview.
+% Is able to handle both Point and Element data for 2D elements (i.e. pipe)
+% Can handle scalars and vector fields.
+% Currentl all data is converted into a double.
 % Julien Mouli-Castillo 
 % v20222202 - initial version
 function vtk_factory(filename, timestep, time, pipe_nodes, xtotal, n_data, n_dat_names, e_data, e_dat_names)
@@ -116,7 +136,7 @@ function vtk_factory(filename, timestep, time, pipe_nodes, xtotal, n_data, n_dat
                 end
     
                 vals = cell2mat(data(d));
-                vals(vals <= 1e-15) = 0;                
+                %vals(vals <= 1e-15) = 0;                
                 for v = 1:length(vals)      
                     if type == 1
                         fprintf(fid, "%.12e\n", vals(v));
